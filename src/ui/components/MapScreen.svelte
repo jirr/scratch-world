@@ -3,6 +3,7 @@
   import { addCells } from '../../data/cell-store';
   import { db } from '../../data/db';
   import { LOCATE_MAX_ACCURACY_M } from '../../domain/config';
+  import { moveMode } from '../../domain/speed-mode';
   import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
@@ -71,7 +72,7 @@
   // Pendant l'enregistrement, le marqueur suit la position sans déplacer la caméra.
   $effect(() => {
     const fix = recorder.lastFix;
-    if (fix) view?.setPosition(fix.lng, fix.lat);
+    if (fix) view?.setPosition(fix.lng, fix.lat, moveMode(recorder.speedMps));
   });
 
   // « Réessayer » depuis la fenêtre de localisation approximative.

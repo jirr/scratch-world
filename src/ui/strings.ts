@@ -12,8 +12,9 @@ export const S = {
   updateUnavailable: 'Vérification impossible pour le moment',
   menuTitle: 'Réglages',
   settingsRecording: 'Enregistrement',
-  settingsAccuracy: 'Précision maximale acceptée',
-  settingsAccuracyHint: 'Les positions moins précises sont ignorées (direct et imports).',
+  settingsAccuracy: 'Précision maximale acceptée (imports)',
+  settingsAccuracyHint:
+    'Les imports ignorent les points moins précis. En direct, la zone de découverte (~1 km) tolère jusqu’à 1 km d’imprécision.',
   settingsKeepTracks: 'Conserver les traces brutes (consomme de la place)',
   settingsWakeLock: 'Garder l’écran allumé par défaut pendant l’enregistrement',
   settingsAppearance: 'Apparence',

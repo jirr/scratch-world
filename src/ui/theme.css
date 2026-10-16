@@ -115,3 +115,11 @@ dialog.sheet::backdrop {
     border-radius: 14px 0 0 14px;
   }
 }
+
+/* Pictogramme de position (bonhomme à pied / trottinette / véhicule). */
+.pin {
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.6));
+  user-select: none;
+}
