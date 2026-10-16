@@ -4,6 +4,7 @@ import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import {
   APPROXIMATE_ACCURACY_M,
+  APPROXIMATE_CONSECUTIVE_FIXES,
   FIRST_FIX_MAX_ACCURACY_M,
   LIVE_FLUSH_MS,
   MAX_GAP_M,
@@ -52,6 +53,7 @@ export class Recorder {
   #seq = 0;
   /** Vrai une fois la zone de départ dévoilée. */
   #started = false;
+  #coarseStreak = 0;
   #flushTimer: ReturnType<typeof setInterval> | null = null;
   #tickTimer: ReturnType<typeof setInterval> | null = null;
   #releaseBusy: (() => void) | null = null;
@@ -85,6 +87,7 @@ export class Recorder {
     this.elapsedMs = 0;
     this.lastFix = null;
     this.approximate = false;
+    this.#coarseStreak = 0;
     this.#startedAt = Date.now();
     this.#releaseBusy = acquireBusy('recording');
     this.state = 'recording';
@@ -121,7 +124,8 @@ export class Recorder {
   #onFix(fix: PositionFix): void {
     if (this.state !== 'recording' || !this.#filter) return;
     this.lastFix = fix;
-    this.approximate = fix.accuracy > APPROXIMATE_ACCURACY_M;
+    this.#coarseStreak = fix.accuracy > APPROXIMATE_ACCURACY_M ? this.#coarseStreak + 1 : 0;
+    this.approximate = this.#coarseStreak >= APPROXIMATE_CONSECUTIVE_FIXES;
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };
     if (this.#filter.accept(point) !== 'accepted') return;
     if (!this.#started) {
