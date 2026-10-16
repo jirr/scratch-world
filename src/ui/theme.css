@@ -128,7 +128,8 @@ dialog.sheet::backdrop {
 .pin-ring {
   position: absolute;
   left: 50%;
-  bottom: 14px;
+  /* Centre du cercle = bas de l'élément = position réelle (les pieds du personnage). */
+  bottom: -70px;
   width: 140px;
   height: 140px;
   margin-left: -70px;
@@ -169,7 +170,7 @@ dialog.sheet::backdrop {
 .pin-shadow {
   position: absolute;
   left: 50%;
-  bottom: 22px;
+  bottom: -8px;
   width: 56px;
   height: 16px;
   margin-left: -28px;
@@ -181,7 +182,7 @@ dialog.sheet::backdrop {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 24px;
+  bottom: -3px;
   text-align: center;
   font-size: 60px;
   line-height: 1;

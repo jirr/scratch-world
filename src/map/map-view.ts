@@ -108,7 +108,7 @@ export class MapView {
       this.#pin.setAttribute('role', 'img');
       this.#pin.innerHTML =
         '<span class="pin-ring"></span><span class="pin-shadow"></span><span class="pin-figure"></span>';
-      this.#marker = new Marker({ element: this.#pin, anchor: 'center' });
+      this.#marker = new Marker({ element: this.#pin, anchor: 'bottom' });
     }
     if (this.#pin && this.#pin.dataset.mode !== mode) {
       this.#pin.dataset.mode = mode;
