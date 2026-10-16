@@ -17,7 +17,7 @@
   .toast {
     position: fixed;
     left: 50%;
-    bottom: calc(16px + env(safe-area-inset-bottom));
+    bottom: calc(92px + env(safe-area-inset-bottom));
     transform: translateX(-50%);
     display: flex;
     align-items: center;
