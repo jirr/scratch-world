@@ -9,7 +9,7 @@ describe('startZoneCells', () => {
   const lng = 2.35;
 
   it('contient la cellule de départ et ≈ π·R² / aire d’une cellule (~230 cellules pour 1 km)', () => {
-    const zone = startZoneCells(lat, lng);
+    const zone = startZoneCells(lat, lng, 1000);
     expect(zone).toContain(latLngToCell(lat, lng, 10));
     expect(new Set(zone).size).toBe(zone.length);
     expect(zone.length).toBeGreaterThan(190);
@@ -17,7 +17,7 @@ describe('startZoneCells', () => {
   });
 
   it('est un disque : toutes les cellules sont dans le rayon, et le bord est atteint dans toutes les directions', () => {
-    const zone = startZoneCells(lat, lng);
+    const zone = startZoneCells(lat, lng, 1000);
     const distances = zone.map((cell) => {
       const [cLat, cLng] = cellToLatLng(cell);
       return haversineM(lat, lng, cLat, cLng);

@@ -119,8 +119,8 @@ dialog.sheet::backdrop {
 /* Personnage de position, style « 3D » : disque au sol, ombre, figure qui flotte et rebondit en mouvement. */
 .pin {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 150px;
+  height: 150px;
   user-select: none;
   pointer-events: none;
 }
@@ -128,25 +128,51 @@ dialog.sheet::backdrop {
 .pin-ring {
   position: absolute;
   left: 50%;
-  bottom: 10px;
-  width: 84px;
-  height: 84px;
-  margin-left: -42px;
+  bottom: 14px;
+  width: 140px;
+  height: 140px;
+  margin-left: -70px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(95 208 168 / 0.1) 40%, rgb(95 208 168 / 0.55) 100%);
-  border: 2px solid rgb(255 255 255 / 0.85);
+  background: radial-gradient(circle, rgb(95 208 168 / 0.12) 35%, rgb(95 208 168 / 0.6) 100%);
+  border: 3px solid rgb(255 255 255 / 0.9);
   transform: rotateX(62deg);
-  box-shadow: 0 0 14px rgb(95 208 168 / 0.8);
-  animation: pin-pulse 2s ease-in-out infinite;
+  box-shadow:
+    0 0 22px rgb(95 208 168 / 0.9),
+    inset 0 0 18px rgb(255 255 255 / 0.5);
+  animation:
+    pin-pulse 1.8s ease-in-out infinite,
+    pin-twinkle 0.9s steps(2, jump-none) infinite;
+}
+
+/* Étincelles qui tournent autour du personnage. */
+.pin-ring::before,
+.pin-ring::after {
+  content: '✦';
+  position: absolute;
+  color: #fff;
+  font-size: 18px;
+  text-shadow: 0 0 8px rgb(95 208 168);
+  animation: pin-spark 1.4s ease-in-out infinite;
+}
+
+.pin-ring::before {
+  top: 8%;
+  left: 14%;
+}
+
+.pin-ring::after {
+  bottom: 12%;
+  right: 12%;
+  animation-delay: 0.7s;
 }
 
 .pin-shadow {
   position: absolute;
   left: 50%;
-  bottom: 18px;
-  width: 44px;
-  height: 14px;
-  margin-left: -22px;
+  bottom: 22px;
+  width: 56px;
+  height: 16px;
+  margin-left: -28px;
   border-radius: 50%;
   background: radial-gradient(ellipse, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 70%);
 }
@@ -155,7 +181,7 @@ dialog.sheet::backdrop {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 18px;
+  bottom: 24px;
   text-align: center;
   font-size: 60px;
   line-height: 1;
@@ -198,13 +224,36 @@ dialog.sheet::backdrop {
 
 @keyframes pin-pulse {
   50% {
-    transform: rotateX(62deg) scale(1.08);
+    transform: rotateX(62deg) scale(1.12);
+  }
+}
+
+@keyframes pin-twinkle {
+  0% {
+    filter: brightness(1);
+  }
+  100% {
+    filter: brightness(1.45);
+  }
+}
+
+@keyframes pin-spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(90deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .pin-figure,
-  .pin-ring {
+  .pin-ring,
+  .pin-ring::before,
+  .pin-ring::after {
     animation: none !important;
   }
 }
