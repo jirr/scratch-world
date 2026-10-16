@@ -3,6 +3,7 @@ import { addCells } from '../data/cell-store';
 import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import {
+  FIRST_FIX_MAX_ACCURACY_M,
   LIVE_FLUSH_MS,
   MAX_GAP_M,
   MAX_GAP_NO_TIME_M,
@@ -63,6 +64,7 @@ export class Recorder {
     const { db, source, wakeLock } = this.#deps;
     this.#filter = new PointFilter({
       maxAccuracyM: await getSetting(db, 'accuracyThresholdM'),
+      firstFixMaxAccuracyM: FIRST_FIX_MAX_ACCURACY_M,
       maxSpeedMps: MAX_SPEED_MPS,
       minDistanceM: MIN_DISTANCE_M,
       speedWindowS: SPEED_WINDOW_S,

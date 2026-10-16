@@ -31,3 +31,6 @@ export const MIN_DISTANCE_M = 5;
 export const SPEED_WINDOW_S = 600;
 /** Intervalle d'écriture des cellules du direct. */
 export const LIVE_FLUSH_MS = 2000;
+
+/** Le premier point d'un enregistrement est accepté jusqu'à cette imprécision : il dévoile la cellule de départ sans attendre un déplacement. */
+export const FIRST_FIX_MAX_ACCURACY_M = 100;
