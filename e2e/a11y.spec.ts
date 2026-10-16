@@ -44,7 +44,7 @@ for (const scheme of ['light', 'dark'] as const) {
 test('la navigation au clavier atteint chaque bouton de la barre', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
-  const wanted = new Set(['Stats', '▶ Démarrer', 'Importer', 'Menu']);
+  const wanted = new Set(['Stats', 'Démarrer', 'Importer', 'Menu']);
   const seen = new Set<string>();
   for (let i = 0; i < 25 && seen.size < wanted.size; i++) {
     await page.keyboard.press('Tab');

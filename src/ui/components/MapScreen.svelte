@@ -12,6 +12,7 @@
   import { isDark, settings } from '../state/settings.svelte';
   import { ui } from '../state/ui.svelte';
   import { S } from '../i18n/i18n.svelte';
+  import Icon from './Icon.svelte';
 
   let {
     recorder,
@@ -125,13 +126,13 @@
   <div class="map" bind:this={container} data-testid="map"></div>
   <button
     type="button"
-    class="locate"
+    class="round locate"
     onclick={locate}
     disabled={locating}
     aria-label={S.locate}
     title={S.locate}
   >
-    ◎
+    <Icon name="locate" size={26} />
   </button>
   <p class="status" role="status">
     {#if locating}{S.locating}{:else if impreciseM !== null}
@@ -151,11 +152,11 @@
     position: fixed;
     right: 12px;
     bottom: calc(96px + env(safe-area-inset-bottom) + 28px);
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    font-size: 1.4rem;
     z-index: 5;
+  }
+
+  .locate:disabled {
+    color: var(--accent);
   }
 
   .status {
