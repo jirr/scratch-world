@@ -99,17 +99,6 @@ describe('Recorder', () => {
     expect(recorder.cellsAdded).toBe(19);
   });
 
-  it('signale une localisation approximative (zone) sans rien dévoiler', async () => {
-    await recorder.start({ wakeLock: false });
-    for (let i = 0; i < 2; i++) source.onFix(walk(i * 1000, 1, 3000)[0] as PositionFix);
-    expect(recorder.approximate).toBe(false);
-    source.onFix(walk(5000, 1, 3000)[0] as PositionFix);
-    expect(recorder.approximate).toBe(true);
-    source.onFix(walk(1000, 1, 20)[0] as PositionFix);
-    expect(recorder.approximate).toBe(false);
-    await recorder.stop();
-  });
-
   it('utilise le seuil de précision des réglages', async () => {
     await setSetting(db, 'accuracyThresholdM', 400);
     await recorder.start({ wakeLock: false });

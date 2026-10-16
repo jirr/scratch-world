@@ -45,36 +45,38 @@ test.describe('géolocalisation accordée', () => {
   });
 });
 
-test.describe('localisation approximative', () => {
+test.describe('localisation imprécise', () => {
   test.use({
     permissions: ['geolocation'],
-    geolocation: { latitude: 48.8584, longitude: 2.2945, accuracy: 5000 },
+    geolocation: { latitude: 48.8584, longitude: 2.2945, accuracy: 3000 },
   });
 
-  test('« Me localiser » demande de passer en position précise', async ({ page }) => {
+  test('« Me localiser » affiche le message avec le lien vers l’aide, sans pop-up automatique', async ({
+    page,
+  }) => {
     await page.goto('');
     await page.getByRole('button', { name: 'Me localiser' }).click();
+    await expect(page.getByRole('status')).toContainText('Position trop imprécise (±3000 m)');
+    await expect(page.getByTestId('approximate-notice')).toBeHidden();
+
+    await page.getByRole('button', { name: /comment activer la localisation précise/ }).click();
     await expect(page.getByTestId('approximate-notice')).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: 'Localisation trop approximative' }),
+      page.getByRole('heading', { name: 'Activer la localisation précise' }),
     ).toBeVisible();
   });
 
-  test('l’enregistrement affiche aussi la demande, après plusieurs positions grossières', async ({
+  test('l’enregistrement affiche le même message tant qu’aucune cellule n’est dévoilée', async ({
     page,
-    context,
   }) => {
     await page.goto('');
     await page.getByRole('button', { name: /Enregistrer/ }).click();
     await page.getByRole('button', { name: 'Démarrer' }).click();
-    for (let i = 1; i <= 3; i++) {
-      await context.setGeolocation({
-        latitude: 48.8584 + i * 0.001,
-        longitude: 2.2945,
-        accuracy: 5000,
-      });
-      await page.waitForTimeout(300);
-    }
-    await expect(page.getByTestId('approximate-notice')).toBeVisible({ timeout: 10_000 });
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Position trop imprécise' }),
+    ).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(page.getByTestId('approximate-notice')).toBeHidden();
   });
 });

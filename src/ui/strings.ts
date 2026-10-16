@@ -112,9 +112,10 @@ export const S = {
   locate: 'Me localiser',
   locating: 'Localisation en cours…',
   locateTooImprecise: (m: number) =>
-    `Position trop imprécise (±${m} m) : la zone n’a pas été dévoilée. Réessaie à l’extérieur.`,
+    `Position trop imprécise (±${m} m) : zone non dévoilée. Réessaie dehors ou`,
+  locateHowTo: 'regarde comment activer la localisation précise',
   accuracy: 'précision',
-  approxTitle: 'Localisation trop approximative',
+  approxTitle: 'Activer la localisation précise',
   approxBody:
     'Ton appareil ne partage qu’une position approximative (zone) : impossible de gratter la carte. Il faut autoriser la localisation précise. Un site ne peut pas redemander cette autorisation lui-même : change le réglage ci-dessous, puis réessaie.',
   approxIos:
