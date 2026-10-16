@@ -32,6 +32,8 @@ test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoi
 }) => {
   await page.goto('');
   await expect(page.getByRole('button', { name: /Pause/ })).toBeVisible({ timeout: 10_000 });
+  // Réveille la source de position de Chromium si le premier fix s'est perdu au chargement.
+  await context.setGeolocation({ ...START, latitude: START.latitude + 1e-6 });
   await expect(page.locator('.pin')).toBeVisible();
   // Plus de bandeau d'enregistrement ni de minuteur.
   await expect(page.getByTestId('recording-indicator')).toHaveCount(0);
