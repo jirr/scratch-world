@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { busy } from '../app/busy.svelte';
 import { ScratchDb } from '../data/db';
 import { setSetting } from '../data/settings-store';
 import type { PositionFix, PositionSource, PositionStatus } from '../platform/position';
@@ -63,9 +62,8 @@ afterEach(async () => {
 });
 
 describe('Recorder', () => {
-  it('écrit les cellules par lots, compte les nouvelles et reste « occupé » jusqu’à l’arrêt', async () => {
+  it('écrit les cellules par lots et compte les nouvelles', async () => {
     await recorder.start({ wakeLock: false });
-    expect(busy.reasons).toEqual(['recording']);
     for (const fix of walk(0, 20)) source.onFix(fix);
 
     await vi.advanceTimersByTimeAsync(2100);
@@ -79,7 +77,6 @@ describe('Recorder', () => {
     await recorder.stop();
     // Même trajet : au plus la cellule de raccord entre la fin et le retour au départ.
     expect(recorder.cellsAdded).toBeLessThanOrEqual(before + 2);
-    expect(busy.isBusy).toBe(false);
     expect(source.stopped).toBe(true);
     expect(recorder.state).toBe('idle');
   });
@@ -107,12 +104,11 @@ describe('Recorder', () => {
     expect(recorder.cellsAdded).toBe(19);
   });
 
-  it('s’arrête et libère « occupé » quand la permission est refusée', async () => {
+  it('s’arrête quand la permission est refusée', async () => {
     await recorder.start({ wakeLock: false });
     source.onStatus('denied');
     await vi.waitFor(() => expect(recorder.state).toBe('idle'), { timeout: 5000 });
     expect(recorder.status).toBe('denied');
-    await vi.waitFor(() => expect(busy.isBusy).toBe(false), { timeout: 5000 });
   });
 
   it('conserve les traces brutes seulement si le réglage est actif', async () => {

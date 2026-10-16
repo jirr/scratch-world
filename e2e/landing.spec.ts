@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { stubOpenFreeMap } from './support/routes';
 
-test.use({ storageState: { cookies: [], origins: [] } });
+test.use({ storageState: { cookies: [], origins: [] }, permissions: ['geolocation'] });
 
 test.beforeEach(async ({ context }) => {
   await stubOpenFreeMap(context);

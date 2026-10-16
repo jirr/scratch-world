@@ -2,6 +2,8 @@
   import { StatsClient } from './app/stats-client.svelte';
   import { BackupSession } from './app/backup-session.svelte';
   import { profile } from './app/profile.svelte';
+  import { recordingPref, setPaused } from './app/recording-pref.svelte';
+  import { getSetting } from './data/settings-store';
   import { ImportSession } from './app/import-session.svelte';
   import { clearAll } from './data/cell-store';
   import { db } from './data/db';
@@ -19,7 +21,6 @@
   import SettingsPanel from './ui/components/SettingsPanel.svelte';
   import PermissionNotice from './ui/components/PermissionNotice.svelte';
   import RecordingIndicator from './ui/components/RecordingIndicator.svelte';
-  import RecordingSheet from './ui/components/RecordingSheet.svelte';
   import StatsPanel from './ui/components/StatsPanel.svelte';
   import UpdateToast from './ui/components/UpdateToast.svelte';
   import { initSettings, settings } from './ui/state/settings.svelte';
@@ -33,7 +34,6 @@
   let menuOpen = $state(false);
   let importOpen = $state(false);
   let statsOpen = $state(false);
-  let sheetOpen = $state(false);
   let permissionOpen = $state(false);
   let approxOpen = $state(false);
   let retryToken = $state(0);
@@ -42,16 +42,42 @@
     document.documentElement.dataset.theme = settings.theme;
   });
 
-  $effect(() => {});
-
   $effect(() => {
     if (recorder.status === 'denied') permissionOpen = true;
   });
 
-  function onRecord() {
-    if (recorder.state === 'recording') void recorder.stop();
-    else sheetOpen = true;
+  async function startRecording() {
+    await recorder.start({ wakeLock: await getSetting(db, 'wakeLockDefault') });
   }
+
+  function onRecord() {
+    if (recorder.state === 'recording') {
+      setPaused(true);
+      void recorder.stop();
+    } else {
+      setPaused(false);
+      void startRecording();
+    }
+  }
+
+  // L'enregistrement démarre tout seul : à la fin de la page d'accueil, ou à l'ouverture si la
+  // localisation est déjà autorisée (sans déclencher de demande d'autorisation au chargement).
+  const cameFromLanding = !profile.pseudo;
+  let autoStarted = false;
+  $effect(() => {
+    if (!profile.pseudo || autoStarted) return;
+    autoStarted = true;
+    if (recordingPref.paused) return;
+    void (async () => {
+      const state = cameFromLanding
+        ? 'prompt'
+        : await navigator.permissions
+            ?.query({ name: 'geolocation' })
+            .then((s) => s.state)
+            .catch(() => 'prompt');
+      if (state === 'granted' || cameFromLanding) await startRecording();
+    })();
+  });
 
   void ensurePersistentStorage();
   void initSettings();
@@ -67,9 +93,10 @@
     onApproximate={() => (approxOpen = true)}
   />
   <ReloadButton />
-  <RecordingIndicator {recorder} />
+  <RecordingIndicator {recorder} paused={recordingPref.paused} />
   <BottomBar
     recording={recorder.state === 'recording'}
+    paused={recordingPref.paused}
     {onRecord}
     onImport={() => (importOpen = true)}
     onStats={() => (statsOpen = true)}
@@ -77,7 +104,6 @@
   />
   <StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
   <ImportPanel session={importSession} open={importOpen} onClose={() => (importOpen = false)} />
-  <RecordingSheet {recorder} open={sheetOpen} onClose={() => (sheetOpen = false)} />
   <ApproximateNotice
     open={approxOpen}
     onRetry={() => retryToken++}
