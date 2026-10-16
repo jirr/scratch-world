@@ -32,7 +32,6 @@ export class Recorder {
   status = $state<PositionStatus>('idle');
   /** Cellules réellement nouvelles ajoutées pendant cette session (hors revisites). */
   cellsAdded = $state(0);
-  elapsedMs = $state(0);
   lastFix = $state<PositionFix | null>(null);
   /** Vitesse lissée (m/s), pour choisir le pictogramme de position. */
   speedMps = $state(0);
@@ -55,7 +54,6 @@ export class Recorder {
   #lastZone: { lat: number; lng: number } | null = null;
   #speed = new SpeedTracker();
   #flushTimer: ReturnType<typeof setInterval> | null = null;
-  #tickTimer: ReturnType<typeof setInterval> | null = null;
   #flushing: Promise<void> = Promise.resolve();
 
   constructor(deps: RecorderDeps) {
@@ -84,15 +82,11 @@ export class Recorder {
     this.#speed.reset();
     this.speedMps = 0;
     this.cellsAdded = 0;
-    this.elapsedMs = 0;
     this.lastFix = null;
     this.#startedAt = Date.now();
     this.state = 'recording';
 
     this.#flushTimer = setInterval(() => void this.#flush(), LIVE_FLUSH_MS);
-    this.#tickTimer = setInterval(() => {
-      this.elapsedMs = Date.now() - this.#startedAt;
-    }, 1000);
     if (options.wakeLock) await wakeLock.enable();
     await source.start(
       (fix) => this.#onFix(fix),
@@ -104,8 +98,7 @@ export class Recorder {
     if (this.state !== 'recording') return;
     this.state = 'idle';
     if (this.#flushTimer) clearInterval(this.#flushTimer);
-    if (this.#tickTimer) clearInterval(this.#tickTimer);
-    this.#flushTimer = this.#tickTimer = null;
+    this.#flushTimer = null;
     await this.#deps.source.stop();
     await this.#flush();
     await this.#deps.wakeLock.disable();

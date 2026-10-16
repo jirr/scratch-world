@@ -17,7 +17,7 @@ export const TILE_SIZE_PX = 512;
 export const EARTH_CIRCUMFERENCE_M = 40_075_016.686;
 
 /** Rayon du noyau radial du brouillard, en arêtes de cellule (la zone dévoilée ≈ 0,87 arête). */
-export const KERNEL_RADIUS_FACTOR = 1.6;
+export const KERNEL_RADIUS_FACTOR = 2.6;
 /** Échelle du masque hors-écran par rapport au drawing buffer. */
 export const MASK_SCALE = 0.5;
 /** Plafond de mémoire des instances conservées côté GPU/CPU, en octets. */
@@ -38,5 +38,5 @@ export const LIVE_MAX_ACCURACY_M = 1000;
 export const DISCOVERY_REFRESH_M = 200;
 /** Imprécision maximale pour que « Me localiser » gratte la zone de départ. */
 export const LOCATE_MAX_ACCURACY_M = 1000;
-/** Zone de découverte : cellule + 8 anneaux ≈ 1 km de rayon (217 cellules). */
-export const START_ZONE_RINGS = 8;
+/** Rayon (m) de la zone de découverte, dévoilée en disque autour de la position. */
+export const DISCOVERY_RADIUS_M = 1000;

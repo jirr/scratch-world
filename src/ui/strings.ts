@@ -102,8 +102,6 @@ export const S = {
     error: 'Erreur',
   },
   importAdded: (n: number) => `${n} ${n > 1 ? 'cellules ajoutées' : 'cellule ajoutée'}`,
-  recording: 'Enregistrement',
-  cells: 'cellules',
   recordPause: 'Pause',
   recordResume: 'Reprendre',
   recordStartNow: 'Démarrer',
@@ -117,7 +115,6 @@ export const S = {
   locateTooImprecise: (m: number) =>
     `Position trop imprécise (±${m} m) : zone non dévoilée. Réessaie dehors ou`,
   locateHowTo: 'regarde comment activer la localisation précise',
-  accuracy: 'précision',
   approxTitle: 'Activer la localisation précise',
   approxBody:
     'Ton appareil ne partage qu’une position approximative (zone) : impossible de gratter la carte. Il faut autoriser la localisation précise. Un site ne peut pas redemander cette autorisation lui-même : change le réglage ci-dessous, puis réessaie.',
