@@ -84,9 +84,14 @@ export class MapView {
     this.#colorScheme.addEventListener('change', this.#onSchemeChange);
   }
 
-  showPosition(lng: number, lat: number): void {
+  /** Place le marqueur de position sans bouger la caméra. */
+  setPosition(lng: number, lat: number): void {
     this.#marker ??= new Marker({ color: '#e5484d' });
     this.#marker.setLngLat([lng, lat]).addTo(this.map);
+  }
+
+  showPosition(lng: number, lat: number): void {
+    this.setPosition(lng, lat);
     this.map.flyTo({ center: [lng, lat], zoom: Math.max(this.map.getZoom(), MIN_LOCATE_ZOOM) });
   }
 

@@ -22,3 +22,12 @@ export const KERNEL_RADIUS_FACTOR = 1.6;
 export const MASK_SCALE = 0.5;
 /** Plafond de mémoire des instances conservées côté GPU/CPU, en octets. */
 export const GPU_CACHE_MAX_BYTES = 32 * 1024 * 1024;
+
+/** Filtrage des points : au-delà de cette vitesse (360 km/h) le point est jugé aberrant. */
+export const MAX_SPEED_MPS = 100;
+/** En dessous de cette distance au dernier point accepté, le point est un doublon. */
+export const MIN_DISTANCE_M = 5;
+/** Le test de vitesse ne s'applique que si les deux points sont proches dans le temps (reprise après un vol). */
+export const SPEED_WINDOW_S = 600;
+/** Intervalle d'écriture des cellules du direct. */
+export const LIVE_FLUSH_MS = 2000;

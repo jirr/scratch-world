@@ -3,6 +3,7 @@
 
   let { open, onClose }: { open: boolean; onClose: () => void } = $props();
   let dialog: HTMLDialogElement | undefined = $state();
+  const titleId = $props.id();
 
   $effect(() => {
     if (!dialog) return;
@@ -14,10 +15,10 @@
 <dialog
   bind:this={dialog}
   onclose={onClose}
-  aria-labelledby="perm-title"
+  aria-labelledby={titleId}
   data-testid="permission-notice"
 >
-  <h2 id="perm-title">{S.permissionTitle}</h2>
+  <h2 id={titleId}>{S.permissionTitle}</h2>
   <p>{S.permissionBody}</p>
   <p>{S.permissionHowTo}</p>
   <ul>
