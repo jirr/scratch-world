@@ -10,4 +10,26 @@ export const S = {
   updateFound: 'Mise à jour trouvée',
   updateNone: 'Vous avez la dernière version',
   updateUnavailable: 'Vérification impossible pour le moment',
+  soon: 'bientôt',
+  navStats: 'Stats',
+  navRecord: 'Enregistrer',
+  navImport: 'Importer',
+  navMenu: 'Menu',
+  locate: 'Me localiser',
+  locating: 'Localisation en cours…',
+  locateUnavailable: 'Position indisponible pour le moment.',
+  close: 'Fermer',
+  menuTitle: 'Menu',
+  storagePersisted: 'Stockage persistant : oui',
+  storageNotPersisted: 'Stockage persistant : non',
+  permissionTitle: 'Position refusée',
+  permissionBody:
+    'Scratch World utilise ta position pour dévoiler la carte là où tu vas. Elle reste sur ton appareil et n’est jamais envoyée ailleurs. Tu peux quand même importer tes traces (GPX, KML, Google Timeline) sans la géolocalisation.',
+  permissionHowTo: 'Pour réautoriser :',
+  permissionIos: 'iPhone : Réglages › Confidentialité › Service de localisation › Safari.',
+  permissionAndroid:
+    'Android (Chrome) : icône cadenas à côté de l’adresse › Autorisations › Position.',
+  webglTitle: 'WebGL2 requis',
+  webglBody:
+    'Cet appareil ou ce navigateur ne propose pas WebGL2, nécessaire pour afficher la carte. Essaie un navigateur récent (Chrome, Safari, Firefox).',
 } as const;

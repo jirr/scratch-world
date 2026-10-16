@@ -1,0 +1,105 @@
+<script lang="ts">
+  import { onMount } from 'svelte';
+  import { MapView, WebGL2RequiredError } from '../../map/map-view';
+  import { createPositionSource, PositionError } from '../../platform/position';
+  import { S } from '../strings';
+  import PermissionNotice from './PermissionNotice.svelte';
+
+  let container: HTMLDivElement | undefined = $state();
+  let webglMissing = $state(false);
+  let locating = $state(false);
+  let locateError = $state<string | null>(null);
+  let permissionOpen = $state(false);
+  let view: MapView | null = null;
+
+  const positionSource = createPositionSource();
+
+  onMount(() => {
+    if (!container) return;
+    try {
+      view = new MapView(container);
+    } catch (error) {
+      if (error instanceof WebGL2RequiredError) {
+        webglMissing = true;
+        return;
+      }
+      throw error;
+    }
+    return () => view?.destroy();
+  });
+
+  async function locate() {
+    locateError = null;
+    locating = true;
+    try {
+      const fix = await positionSource.getCurrent();
+      view?.showPosition(fix.lng, fix.lat);
+    } catch (error) {
+      if (error instanceof PositionError && error.status === 'denied') permissionOpen = true;
+      else locateError = S.locateUnavailable;
+    } finally {
+      locating = false;
+    }
+  }
+</script>
+
+{#if webglMissing}
+  <div class="webgl" role="alert" data-testid="webgl-required">
+    <h1>{S.webglTitle}</h1>
+    <p>{S.webglBody}</p>
+  </div>
+{:else}
+  <div class="map" bind:this={container} data-testid="map"></div>
+  <button
+    type="button"
+    class="locate"
+    onclick={locate}
+    disabled={locating}
+    aria-label={S.locate}
+    title={S.locate}
+  >
+    ◎
+  </button>
+  <p class="status" role="status">
+    {#if locating}{S.locating}{:else if locateError}{locateError}{/if}
+  </p>
+{/if}
+
+<PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
+
+<style>
+  .map {
+    position: fixed;
+    inset: 0 0 calc(76px + env(safe-area-inset-bottom)) 0;
+  }
+
+  .locate {
+    position: fixed;
+    right: 12px;
+    bottom: calc(96px + env(safe-area-inset-bottom) + 28px);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    z-index: 5;
+  }
+
+  .status {
+    position: fixed;
+    left: 12px;
+    top: calc(12px + env(safe-area-inset-top));
+    margin: 0;
+    z-index: 5;
+    color: var(--fg);
+  }
+
+  .status:empty {
+    display: none;
+  }
+
+  .webgl {
+    padding: calc(24px + env(safe-area-inset-top)) 20px;
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+</style>
