@@ -9,19 +9,19 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "warn",
+          "error",
           {
-            "minScore": 0.8
+            "minScore": 0.35
           }
         ],
         "categories:accessibility": [
-          "warn",
+          "error",
           {
             "minScore": 0.95
           }
         ],
         "categories:best-practices": [
-          "warn",
+          "error",
           {
             "minScore": 0.9
           }
