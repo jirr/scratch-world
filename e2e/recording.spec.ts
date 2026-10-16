@@ -15,12 +15,13 @@ test.beforeEach(async ({ context }) => {
 async function readCells(page: Page): Promise<number> {
   await page.getByRole('button', { name: 'Stats' }).click();
   const cells = page.getByTestId('stats-cells');
-  await expect(cells).toBeVisible();
   // Le panneau affiche d'abord le cache : on attend la fin du recalcul.
   await expect(page.getByTestId('stats-panel').getByRole('status')).toHaveText('', {
     timeout: 15_000,
   });
-  const value = Number((await cells.innerText()).replace(/\s/g, ''));
+  // Sans cellule dévoilée, le panneau n'affiche pas le compteur.
+  const value =
+    (await cells.count()) === 0 ? 0 : Number((await cells.innerText()).replace(/\s/g, ''));
   await page.getByRole('button', { name: 'Fermer' }).click();
   return value;
 }
