@@ -9,6 +9,7 @@
   import { createPositionSource, PositionError } from '../../platform/position';
   import type { Recorder } from '../../recording/recorder.svelte';
   import { isDark, settings } from '../state/settings.svelte';
+  import { ui } from '../state/ui.svelte';
   import { S } from '../strings';
 
   let {
@@ -49,6 +50,10 @@
 
   $effect(() => {
     view?.setAppearance(currentAppearance());
+  });
+
+  $effect(() => {
+    view?.fog.setHidden(ui.stylePreview);
   });
 
   onMount(() => {

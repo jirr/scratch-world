@@ -29,6 +29,7 @@ for (const scheme of ['light', 'dark'] as const) {
       ['Stats', 'stats-panel'],
       ['Importer', 'import-panel'],
       ['Menu', 'menu-panel'],
+      ['Style de carte', 'style-picker'],
     ] as const) {
       test(`panneau ${panel}`, async ({ page }) => {
         await page.goto('');

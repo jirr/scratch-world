@@ -20,7 +20,9 @@ export const S = {
   settingsAppearance: 'Apparence',
   settingsTheme: 'Thème',
   themes: { system: 'Automatique', light: 'Clair', dark: 'Sombre' },
-  settingsMapStyle: 'Style de carte',
+  mapStyleOpen: 'Style de carte',
+  mapStyleTitle: 'Style de carte',
+  mapStylePreviewHint: 'Le brouillard est masqué pour que tu voies le rendu.',
   mapStyles: {
     auto: 'Automatique',
     liberty: 'Liberty',

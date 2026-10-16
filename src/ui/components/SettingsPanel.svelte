@@ -4,7 +4,6 @@
   import { profile, setPseudo } from '../../app/profile.svelte';
   import { checkForUpdate, type UpdateCheckResult } from '../../app/update-service.svelte';
   import type { BackupSession } from '../../app/backup-session.svelte';
-  import { isValidStyleUrl } from '../../map/styles';
   import { storageState } from '../../platform/storage-persist.svelte';
   import { changeSetting, settings } from '../state/settings.svelte';
   import { S } from '../strings';
@@ -34,11 +33,6 @@
     'up-to-date': S.updateNone,
     unavailable: S.updateUnavailable,
   };
-  const styleInvalid = $derived(
-    settings.mapStyle === 'custom' &&
-      settings.customStyleUrl !== '' &&
-      !isValidStyleUrl(settings.customStyleUrl),
-  );
 
   $effect(() => {
     if (!dialog) return;
@@ -134,33 +128,6 @@
         {/each}
       </select>
     </label>
-    <label class="field">
-      <span>{S.settingsMapStyle}</span>
-      <select
-        value={settings.mapStyle}
-        onchange={(e) =>
-          void changeSetting('mapStyle', e.currentTarget.value as typeof settings.mapStyle)}
-      >
-        {#each Object.entries(S.mapStyles) as [value, label] (value)}
-          <option {value}>{label}</option>
-        {/each}
-      </select>
-    </label>
-    {#if settings.mapStyle === 'custom'}
-      <label class="field">
-        <span>{S.settingsCustomStyle}</span>
-        <input
-          type="url"
-          inputmode="url"
-          placeholder="https://…/style.json"
-          value={settings.customStyleUrl}
-          aria-invalid={styleInvalid}
-          onchange={(e) => void changeSetting('customStyleUrl', e.currentTarget.value.trim())}
-        />
-        {#if styleInvalid}<small class="error" role="alert">{S.settingsCustomStyleInvalid}</small
-          >{/if}
-      </label>
-    {/if}
   </section>
 
   <section aria-labelledby="{titleId}-data">
@@ -268,8 +235,7 @@
   }
 
   select,
-  input[type='text'],
-  input[type='url'] {
+  input[type='text'] {
     font: inherit;
     padding: 8px;
     border-radius: 8px;

@@ -20,6 +20,7 @@
   import ReloadButton from './ui/components/ReloadButton.svelte';
   import SettingsPanel from './ui/components/SettingsPanel.svelte';
   import PermissionNotice from './ui/components/PermissionNotice.svelte';
+  import MapStylePicker from './ui/components/MapStylePicker.svelte';
   import PausedBadge from './ui/components/PausedBadge.svelte';
   import StatsPanel from './ui/components/StatsPanel.svelte';
   import UpdateToast from './ui/components/UpdateToast.svelte';
@@ -93,6 +94,7 @@
     onApproximate={() => (approxOpen = true)}
   />
   <ReloadButton />
+  <MapStylePicker />
   <PausedBadge paused={recordingPref.paused && recorder.state !== 'recording'} />
   <BottomBar
     recording={recorder.state === 'recording'}

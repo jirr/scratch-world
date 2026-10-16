@@ -88,6 +88,7 @@ export class FogLayer implements CustomLayerInterface {
   #emptyVao: WebGLVertexArrayObject | null = null;
   #noise: WebGLTexture | null = null;
   #theme = THEMES.light;
+  #hidden = false;
   #seq = 0;
   #lastRefresh = 0;
   #timer: ReturnType<typeof setTimeout> | null = null;
@@ -108,6 +109,12 @@ export class FogLayer implements CustomLayerInterface {
 
   get stats(): FogStats {
     return this.#stats;
+  }
+
+  /** Masque le brouillard (aperçu d'un style de carte). */
+  setHidden(hidden: boolean): void {
+    this.#hidden = hidden;
+    this.#map.triggerRepaint();
   }
 
   setDark(dark: boolean): void {
@@ -219,7 +226,7 @@ export class FogLayer implements CustomLayerInterface {
   /** Passe 2 : compose le brouillard plein écran, percé là où le masque est fort. */
   render(gl: WebGL2RenderingContext): void {
     const programs = this.#programs;
-    if (!programs || !this.#mask) return;
+    if (!programs || !this.#mask || this.#hidden) return;
     const view = this.#view(gl);
     const dpr = gl.drawingBufferWidth / view.width;
     const [nx, ny] = noiseOffset(view, NOISE_SIZE);
