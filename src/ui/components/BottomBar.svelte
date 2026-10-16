@@ -57,8 +57,8 @@
   }
 
   .fab.active {
-    background: #e5484d;
-    border-color: #e5484d;
+    background: var(--danger);
+    border-color: var(--danger);
     color: #fff;
   }
 </style>

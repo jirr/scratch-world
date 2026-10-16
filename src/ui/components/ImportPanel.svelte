@@ -31,6 +31,7 @@
 </script>
 
 <dialog
+  class="sheet"
   bind:this={dialog}
   onclose={onClose}
   oncancel={(e) => session.state === 'running' && e.preventDefault()}
@@ -111,11 +112,9 @@
 
 <style>
   dialog {
-    width: min(28rem, calc(100vw - 32px));
     background: var(--surface);
     color: var(--fg);
     border: 1px solid var(--border);
-    border-radius: 14px;
   }
 
   progress {
@@ -192,6 +191,6 @@
 
   .results .error span,
   .results .unsupported span {
-    color: #e5484d;
+    color: var(--danger-text);
   }
 </style>

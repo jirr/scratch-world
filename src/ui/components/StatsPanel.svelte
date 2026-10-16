@@ -27,6 +27,7 @@
 </script>
 
 <dialog
+  class="sheet"
   bind:this={dialog}
   onclose={() => {
     client.close();
@@ -80,12 +81,9 @@
 
 <style>
   dialog {
-    width: min(30rem, calc(100vw - 32px));
-    max-height: calc(100dvh - 48px);
     background: var(--surface);
     color: var(--fg);
     border: 1px solid var(--border);
-    border-radius: 14px;
   }
 
   .totals {

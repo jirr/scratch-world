@@ -1,23 +1,41 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #f4f5f8;
   --fg: #14161c;
-  --muted: #5a6070;
+  --muted: #565d6d;
   --surface: #ffffff;
-  --border: #d3d7e0;
+  --border: #c9cedb;
   --accent: #0b7a5c;
   --accent-fg: #ffffff;
+  --danger: #c4262b;
+  --danger-text: #b3202a;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0c0e14;
+  --fg: #eef0f6;
+  --muted: #a3aabb;
+  --surface: #1a1e29;
+  --border: #3a4152;
+  --accent: #5fd0a8;
+  --accent-fg: #0c0e14;
+  --danger: #c4262b;
+  --danger-text: #ff8a8e;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    color-scheme: dark;
     --bg: #0c0e14;
     --fg: #eef0f6;
-    --muted: #9aa1b2;
+    --muted: #a3aabb;
     --surface: #1a1e29;
-    --border: #2f3544;
+    --border: #3a4152;
     --accent: #5fd0a8;
     --accent-fg: #0c0e14;
+    --danger: #c4262b;
+    --danger-text: #ff8a8e;
   }
 }
 
@@ -63,4 +81,37 @@ button.primary {
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Panneaux : bottom sheet sur mobile, panneau latéral droit dès 900 px. */
+dialog.sheet {
+  box-sizing: border-box;
+  padding: 16px 20px;
+  overflow: auto;
+}
+
+dialog.sheet::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+
+@media (max-width: 899px) {
+  dialog.sheet {
+    width: 100%;
+    max-width: none;
+    max-height: 88dvh;
+    margin: auto 0 0 0;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 900px) {
+  dialog.sheet {
+    width: min(28rem, 40vw);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0 0 0 auto;
+    border-radius: 14px 0 0 14px;
+  }
 }

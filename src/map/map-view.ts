@@ -3,7 +3,7 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { installDebugOverlay } from './fog/debug-overlay';
 import { FogLayer } from './fog/fog-layer';
-import { autoStyleUrl } from './styles';
+import { resolveStyleUrl, type Appearance } from './styles';
 
 setWorkerUrl(workerUrl);
 
@@ -44,19 +44,16 @@ export class MapView {
   readonly fog: FogLayer;
   #removeOverlay: (() => void) | null = null;
   #marker: Marker | null = null;
-  #colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  #onSchemeChange = () => {
-    this.map.setStyle(autoStyleUrl(this.#colorScheme.matches));
-    this.fog.setDark(this.#colorScheme.matches);
-  };
+  #styleUrl: string;
 
   /** @throws {WebGL2RequiredError} si WebGL2 est indisponible. */
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, appearance: Appearance) {
     const camera = loadCamera();
+    this.#styleUrl = resolveStyleUrl(appearance);
     try {
       this.map = new MapLibreMap({
         container,
-        style: autoStyleUrl(this.#colorScheme.matches),
+        style: this.#styleUrl,
         center: [camera.lng, camera.lat],
         zoom: camera.zoom,
         maxPitch: 0,
@@ -70,7 +67,7 @@ export class MapView {
       if (error instanceof GPUInitializationError) throw new WebGL2RequiredError();
       throw error;
     }
-    this.fog = new FogLayer(this.map, this.#colorScheme.matches);
+    this.fog = new FogLayer(this.map, appearance.dark);
     this.map.on('style.load', () => this.fog.attach());
     if (new URLSearchParams(location.search).get('debug') === '1') {
       this.#removeOverlay = installDebugOverlay(this.fog);
@@ -81,7 +78,16 @@ export class MapView {
       const { lng, lat } = this.map.getCenter();
       localStorage.setItem(CAMERA_KEY, JSON.stringify({ lng, lat, zoom: this.map.getZoom() }));
     });
-    this.#colorScheme.addEventListener('change', this.#onSchemeChange);
+  }
+
+  /** Applique le style choisi (ne recharge la carte que si l'URL change) et le thème du brouillard. */
+  setAppearance(appearance: Appearance): void {
+    const url = resolveStyleUrl(appearance);
+    if (url !== this.#styleUrl) {
+      this.#styleUrl = url;
+      this.map.setStyle(url);
+    }
+    this.fog.setDark(appearance.dark);
   }
 
   /** Place le marqueur de position sans bouger la caméra. */
@@ -96,7 +102,6 @@ export class MapView {
   }
 
   destroy(): void {
-    this.#colorScheme.removeEventListener('change', this.#onSchemeChange);
     this.#removeOverlay?.();
     this.map.remove();
     this.fog.destroy();

@@ -25,6 +25,7 @@
 </script>
 
 <dialog
+  class="sheet"
   bind:this={dialog}
   onclose={onClose}
   aria-labelledby="rec-title"
@@ -46,11 +47,9 @@
 
 <style>
   dialog {
-    max-width: min(26rem, calc(100vw - 32px));
     background: var(--surface);
     color: var(--fg);
     border: 1px solid var(--border);
-    border-radius: 14px;
   }
 
   .actions {
