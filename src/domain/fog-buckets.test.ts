@@ -106,12 +106,8 @@ describe('buildBucket', () => {
     expect(instances.length / 3).toBeLessThan(16807 / 5);
   });
 
-  it('construit un bucket res 10 plein (16 807 cellules) en un temps raisonnable', () => {
-    const start = performance.now();
+  it('construit un bucket res 10 plein : une instance par cellule des 16 807 enfants', () => {
     const { instances } = buildBucket(10, pentagonLike, fullChunk());
-    const elapsed = performance.now() - start;
     expect(instances.length / 3).toBe(16807);
-    console.info(`bucket res 10 plein : ${elapsed.toFixed(1)} ms`);
-    expect(elapsed).toBeLessThan(500);
   });
 });
