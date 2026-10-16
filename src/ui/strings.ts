@@ -44,8 +44,11 @@ export const S = {
   clearDone: 'Données effacées',
   settingsAbout: 'À propos',
   reload: 'Recharger la page',
+  reloadTitle: 'Recharger la page ?',
+  reloadBody: 'L’application est relancée ; tes données restent sur l’appareil.',
   reloadConfirm:
-    'Une opération est en cours (enregistrement, import ou restauration). La recharger l’interrompra. Continuer ?',
+    'Attention : un enregistrement, un import ou une restauration est en cours, le recharger l’interrompra.',
+  reloadAction: 'Recharger',
   installTitle: 'Installer Scratch World',
   installBody:
     'Ajoute l’application à ton écran d’accueil : elle s’ouvre en plein écran et fonctionne hors ligne.',

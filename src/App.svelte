@@ -15,6 +15,7 @@
   import InstallPrompt from './ui/components/InstallPrompt.svelte';
   import Landing from './ui/components/Landing.svelte';
   import MapScreen from './ui/components/MapScreen.svelte';
+  import ReloadButton from './ui/components/ReloadButton.svelte';
   import SettingsPanel from './ui/components/SettingsPanel.svelte';
   import PermissionNotice from './ui/components/PermissionNotice.svelte';
   import RecordingIndicator from './ui/components/RecordingIndicator.svelte';
@@ -65,6 +66,7 @@
     onPermissionDenied={() => (permissionOpen = true)}
     onApproximate={() => (approxOpen = true)}
   />
+  <ReloadButton />
   <RecordingIndicator {recorder} />
   <BottomBar
     recording={recorder.state === 'recording'}
