@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint et svelte-check ne supportent pas encore TypeScript >= 6.1.
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
