@@ -8,11 +8,18 @@ import type { ChunkRow, ScratchDb } from './db';
  * transaction `rw` : IndexedDB sérialise les écritures concurrentes (thread principal et workers).
  * L'événement est émis après le commit, et seulement si des cellules ont réellement été ajoutées.
  */
-export async function addCells(
+export function addCells(
   db: ScratchDb,
   cells: Iterable<string>,
 ): Promise<{ added: number; chunks: string[] }> {
-  const groups = groupByChunk(cells);
+  return addChunks(db, groupByChunk(cells));
+}
+
+/** Comme `addCells`, à partir de positions déjà groupées par chunk (triées, uniques). */
+export async function addChunks(
+  db: ScratchDb,
+  groups: Map<string, Uint16Array>,
+): Promise<{ added: number; chunks: string[] }> {
   if (groups.size === 0) return { added: 0, chunks: [] };
 
   let added = 0;
