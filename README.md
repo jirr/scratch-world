@@ -63,6 +63,10 @@ Formats : GPX, KML (dont `gx:Track`), Google Timeline Android (`semanticSegments
 
 Surface dévoilée, nombre de cellules, part du **monde émergé** (somme des surfaces des pays Natural Earth 1:50m v5.1.2, domaine public) et surface par pays. Chaque cellule de résolution 7 (~1,4 km) est rattachée à un pays par point-dans-polygone (centre, puis sommets pour les cellules côtières, sinon « mer ») dans `stats.worker` ; le résultat est mis en cache dans la table `regionCache`, invalidée si la version du jeu de données change. `pnpm build:countries` régénère `public/data/countries-50m.v1.json`.
 
+## Sauvegarde et réglages
+
+Réglages > Données : **Sauvegarder** télécharge `scratch-world-AAAA-MM-JJ.json.gz` (cellules, imports, et traces brutes si la case est cochée) ; **Restaurer** _fusionne_ (union des cellules, jamais de suppression) et refuse un fichier d’une version plus récente ou d’une autre résolution ; **Tout effacer** demande confirmation (focus sur Annuler) et conserve les réglages. Réglages : précision maximale (10–200 m), traces brutes (désactivées par défaut), thème, style de carte (OpenFreeMap ou URL https personnalisée), écran allumé par défaut.
+
 ## Mise à jour de la PWA
 
 Le service worker est enregistré en mode `prompt` : une nouvelle version ne remplace jamais l'ancienne sans accord. L'application vérifie la présence d'une mise à jour au retour au premier plan et toutes les heures, puis affiche « Nouvelle version disponible ». Le toast est **différé tant qu'une opération longue est en cours** (import, enregistrement, restauration). La version affichée (`vX.Y.Z (sha)`) permet de vérifier ce qui tourne.
