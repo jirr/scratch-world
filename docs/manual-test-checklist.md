@@ -69,6 +69,7 @@ Cocher chaque ligne et noter le résultat (appareil, version affichée dans Rég
 
 - [ ] Thème clair/sombre/automatique appliqué à toute l'interface et au brouillard.
 - [ ] Style de carte alternatif appliqué ; une URL de style invalide est signalée.
+- [ ] Langue : un appareil en anglais affiche l'app en anglais, en français en français ; « Langue » dans les réglages change toute l'interface sans recharger et reste mémorisée ; « Langue du système » revient à celle de l'appareil.
 - [ ] « Stockage persistant » affiché ; « Rechercher une mise à jour » répond.
 
 ## 10. Performance (bench 500 000 cellules)

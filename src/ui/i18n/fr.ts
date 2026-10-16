@@ -1,5 +1,8 @@
-/** Textes de l'interface (français uniquement), centralisés. */
-export const S = {
+import type { BackupMessage } from '../../app/backup-session.svelte';
+import type { MoveMode } from '../../domain/speed-mode';
+
+/** Textes français ; la structure fait référence (`Messages`) pour les autres langues. */
+export const fr = {
   appName: 'Scratch World',
   tagline: 'Gratte la carte du monde là où tu es allé. Tes données restent sur ton appareil.',
   updateAvailable: 'Nouvelle version disponible',
@@ -7,12 +10,14 @@ export const S = {
   updateDismiss: 'Plus tard',
   updateCheck: 'Rechercher une mise à jour',
   updateChecking: 'Recherche en cours…',
-  updateFound: 'Mise à jour trouvée',
-  updateNone: 'Vous avez la dernière version',
-  updateUnavailable: 'Vérification impossible pour le moment',
+  updateResults: {
+    found: 'Mise à jour trouvée',
+    'up-to-date': 'Vous avez la dernière version',
+    unavailable: 'Vérification impossible pour le moment',
+  },
   menuTitle: 'Réglages',
   settingsRecording: 'Enregistrement',
-  settingsAccuracy: 'Précision maximale acceptée (imports)',
+  settingsAccuracy: (m: number) => `Précision maximale acceptée (imports) : ${m} m`,
   settingsAccuracyHint:
     'Les imports ignorent les points moins précis. En direct, la zone de découverte (~1 km) tolère jusqu’à 1 km d’imprécision.',
   settingsKeepTracks: 'Conserver les traces brutes (consomme de la place)',
@@ -20,6 +25,8 @@ export const S = {
   settingsAppearance: 'Apparence',
   settingsTheme: 'Thème',
   themes: { system: 'Automatique', light: 'Clair', dark: 'Sombre' },
+  settingsLanguage: 'Langue',
+  languages: { system: 'Langue du système', fr: 'Français', en: 'English' },
   mapStyleOpen: 'Style de carte',
   mapStyleTitle: 'Style de carte',
   mapStylePreviewHint: 'Le brouillard est masqué pour que tu voies le rendu.',
@@ -39,6 +46,37 @@ export const S = {
   backupIncludeTracks: 'Inclure les traces brutes',
   backupRestore: 'Restaurer une sauvegarde',
   backupRestoreHint: 'La restauration fusionne : rien n’est supprimé.',
+  backupStatus(message: BackupMessage): string {
+    if (message.kind === 'exported') return 'Sauvegarde téléchargée';
+    if (message.kind === 'export-failed') return 'Sauvegarde impossible';
+    if (message.kind === 'restored') {
+      const n = message.cellsAdded;
+      return `Restauration terminée : ${n} ${n > 1 ? 'cellules ajoutées' : 'cellule ajoutée'}`;
+    }
+    const failure = message.failure;
+    switch (failure?.reason) {
+      case undefined:
+        return 'Restauration impossible';
+      case 'invalid-json':
+        return 'Ce fichier n’est pas une sauvegarde Scratch World valide';
+      case 'not-backup':
+        return 'Ce fichier n’est pas une sauvegarde Scratch World';
+      case 'newer-version':
+        return `Sauvegarde d’une version plus récente (${failure.version}) : mets l’application à jour`;
+      case 'resolution':
+        return `Résolution incompatible (stockage ${failure.found.storageRes}, chunk ${failure.found.chunkRes}) : cette application utilise ${failure.expected.storageRes} et ${failure.expected.chunkRes}`;
+      case 'incomplete':
+        return 'Sauvegarde incomplète';
+      case 'corrupt':
+        return `Sauvegarde corrompue (${
+          {
+            positions: 'positions invalides',
+            tracks: 'traces invalides',
+            'out-of-chunk': 'position hors chunk',
+          }[failure.part]
+        })`;
+    }
+  },
   clearAll: 'Tout effacer',
   clearTitle: 'Tout effacer ?',
   clearBody:
@@ -82,11 +120,15 @@ export const S = {
   statsCells: 'Cellules',
   statsWorld: 'du monde émergé',
   statsComputing: 'Calcul en cours…',
+  statsFailed: 'Calcul impossible pour le moment.',
   statsEmpty: 'Rien de dévoilé pour l’instant : enregistre ou importe une trace.',
   statsCountries: 'Pays',
   statsSea: 'Mer et zones non rattachées exclues du pourcentage.',
   statsDataset: 'Frontières : Natural Earth 1:50m.',
+  /** Le jeu de données porte déjà les noms français (Natural Earth `NAME_FR`). */
+  countryName: (_code: string, datasetName: string) => datasetName,
   lessThan: (value: string) => `< ${value}`,
+  percent: (value: string) => `${value} %`,
   importTitle: 'Importer des traces',
   importBody:
     'GPX, KML, Google Timeline (Android ou iPhone) et Records.json. Les fichiers sont lus sur ton appareil et ne sont jamais envoyés ailleurs.',
@@ -96,22 +138,31 @@ export const S = {
   importCancel: 'Annuler l’import',
   importPhases: { hashing: 'Empreinte du fichier', parsing: 'Lecture', writing: 'Écriture' },
   importAgain: 'Importer d’autres fichiers',
+  importFailed: 'Import impossible',
   importStatus: {
     duplicate: 'Déjà importé',
     unsupported: 'Format non reconnu',
     empty: 'Aucun point exploitable',
+    'too-large': 'Fichier XML trop volumineux',
     cancelled: 'Annulé',
-    error: 'Erreur',
   },
+  importError: (detail: string | undefined) => (detail ? `Erreur : ${detail}` : 'Erreur'),
   importAdded: (n: number) => `${n} ${n > 1 ? 'cellules ajoutées' : 'cellule ajoutée'}`,
   recordPause: 'Pause',
   recordResume: 'Reprendre',
   recordStartNow: 'Démarrer',
   paused: 'Scratch en pause : la carte ne se dévoile plus',
   cancel: 'Annuler',
+  navLabel: 'Navigation principale',
   navStats: 'Stats',
   navImport: 'Importer',
   navMenu: 'Menu',
+  pinLabels: {
+    idle: 'Ta position (à l’arrêt)',
+    walk: 'Ta position (à pied)',
+    scooter: 'Ta position (en trottinette)',
+    vehicle: 'Ta position (en véhicule)',
+  } satisfies Record<MoveMode, string>,
   locate: 'Me localiser',
   locating: 'Localisation en cours…',
   locateTooImprecise: (m: number) =>
@@ -140,4 +191,6 @@ export const S = {
   webglTitle: 'WebGL2 requis',
   webglBody:
     'Cet appareil ou ce navigateur ne propose pas WebGL2, nécessaire pour afficher la carte. Essaie un navigateur récent (Chrome, Safari, Firefox).',
-} as const;
+};
+
+export type Messages = typeof fr;

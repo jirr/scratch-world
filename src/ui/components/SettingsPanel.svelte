@@ -6,7 +6,7 @@
   import type { BackupSession } from '../../app/backup-session.svelte';
   import { storageState } from '../../platform/storage-persist.svelte';
   import { changeSetting, settings } from '../state/settings.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
   import ClearDialog from './ClearDialog.svelte';
 
   let {
@@ -27,12 +27,6 @@
   let updateResult = $state<UpdateCheckResult | null>(null);
   let cleared = $state(false);
   const titleId = $props.id();
-
-  const updateMessages: Record<UpdateCheckResult, string> = {
-    found: S.updateFound,
-    'up-to-date': S.updateNone,
-    unavailable: S.updateUnavailable,
-  };
 
   $effect(() => {
     if (!dialog) return;
@@ -85,7 +79,7 @@
   <section aria-labelledby="{titleId}-rec">
     <h3 id="{titleId}-rec">{S.settingsRecording}</h3>
     <label class="field">
-      <span>{S.settingsAccuracy} : {settings.accuracyThresholdM} m</span>
+      <span>{S.settingsAccuracy(settings.accuracyThresholdM)}</span>
       <input
         type="range"
         min="10"
@@ -128,6 +122,18 @@
         {/each}
       </select>
     </label>
+    <label class="field">
+      <span>{S.settingsLanguage}</span>
+      <select
+        value={settings.language}
+        onchange={(e) =>
+          void changeSetting('language', e.currentTarget.value as typeof settings.language)}
+      >
+        {#each Object.entries(S.languages) as [value, label] (value)}
+          <option {value}>{label}</option>
+        {/each}
+      </select>
+    </label>
   </section>
 
   <section aria-labelledby="{titleId}-data">
@@ -162,8 +168,13 @@
     <p class="row">
       <button type="button" class="danger" onclick={() => (clearOpen = true)}>{S.clearAll}</button>
     </p>
-    <p role="status" data-testid="backup-status" class:error={backup.message?.kind === 'error'}>
-      {#if backup.message}{backup.message.text}{:else if cleared}{S.clearDone}{/if}
+    <p
+      role="status"
+      data-testid="backup-status"
+      class:error={backup.message?.kind === 'export-failed' ||
+        backup.message?.kind === 'restore-failed'}
+    >
+      {#if backup.message}{S.backupStatus(backup.message)}{:else if cleared}{S.clearDone}{/if}
     </p>
   </section>
 
@@ -179,7 +190,7 @@
     <button type="button" onclick={onCheck} disabled={checking}>
       {checking ? S.updateChecking : S.updateCheck}
     </button>
-    {#if updateResult}<p data-testid="update-check-result">{updateMessages[updateResult]}</p>{/if}
+    {#if updateResult}<p data-testid="update-check-result">{S.updateResults[updateResult]}</p>{/if}
   </section>
 
   <p class="row end">

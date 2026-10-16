@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { StatsClient } from '../../app/stats-client.svelte';
-  import { S } from '../strings';
+  import { i18n, S } from '../i18n/i18n.svelte';
 
   let { client, open, onClose }: { client: StatsClient; open: boolean; onClose: () => void } =
     $props();
@@ -16,14 +16,14 @@
     if (!open && dialog.open) dialog.close();
   });
 
-  const int = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
-  const dec = new Intl.NumberFormat('fr-FR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  const int = $derived(new Intl.NumberFormat(i18n.locale, { maximumFractionDigits: 0 }));
+  const dec = $derived(
+    new Intl.NumberFormat(i18n.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+  );
 
   const km2 = (n: number) => `${n < 10 ? dec.format(n) : int.format(n)} km²`;
-  const pct = (n: number) => (n > 0 && n < 0.01 ? `${S.lessThan('0,01')} %` : `${dec.format(n)} %`);
+  const pct = (n: number) =>
+    n > 0 && n < 0.01 ? S.percent(S.lessThan(dec.format(0.01))) : S.percent(dec.format(n));
 </script>
 
 <dialog
@@ -58,7 +58,7 @@
     <ul class="countries" data-testid="stats-countries">
       {#each stats.countries as country (country.code)}
         <li>
-          <span class="name">{country.name}</span>
+          <span class="name">{S.countryName(country.code, country.name)}</span>
           <span>{km2(country.areaKm2)}</span>
           <span class="muted">{pct(country.pct)}</span>
         </li>
@@ -71,7 +71,7 @@
 
   <p class="status" role="status">
     {#if client.computing}{S.statsComputing}{/if}
-    {#if client.error}{client.error}{/if}
+    {#if client.failed}{S.statsFailed}{/if}
   </p>
 
   <p class="actions">

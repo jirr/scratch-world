@@ -24,10 +24,23 @@ export interface RestoreResult {
   tracksAdded: number;
 }
 
-/** Fichier de sauvegarde refusé : le message est destiné à l'utilisateur. */
+/** Raison du refus d'un fichier de sauvegarde ; le texte affiché est choisi par l'interface. */
+export type BackupFailure =
+  | { reason: 'invalid-json' }
+  | { reason: 'not-backup' }
+  | { reason: 'newer-version'; version: string }
+  | {
+      reason: 'resolution';
+      found: { storageRes: string; chunkRes: string };
+      expected: { storageRes: number; chunkRes: number };
+    }
+  | { reason: 'incomplete' }
+  | { reason: 'corrupt'; part: 'positions' | 'tracks' | 'out-of-chunk' };
+
+/** Fichier de sauvegarde refusé ; `failure` décrit la raison. */
 export class BackupError extends Error {
-  constructor(message: string) {
-    super(message);
+  constructor(readonly failure: BackupFailure) {
+    super(`Backup rejected: ${failure.reason}`);
     this.name = 'BackupError';
   }
 }
@@ -56,13 +69,13 @@ const encodeFloat64 = (a: Float64Array) =>
 
 function decodeUint16(text: string): Uint16Array {
   const bytes = base64ToBytes(text);
-  if (bytes.length % 2 !== 0) throw new BackupError('Sauvegarde corrompue (positions invalides)');
+  if (bytes.length % 2 !== 0) throw new BackupError({ reason: 'corrupt', part: 'positions' });
   return new Uint16Array(bytes.buffer, 0, bytes.length / 2);
 }
 
 function decodeFloat64(text: string): Float64Array {
   const bytes = base64ToBytes(text);
-  if (bytes.length % 8 !== 0) throw new BackupError('Sauvegarde corrompue (traces invalides)');
+  if (bytes.length % 8 !== 0) throw new BackupError({ reason: 'corrupt', part: 'tracks' });
   return new Float64Array(bytes.buffer, 0, bytes.length / 8);
 }
 
@@ -118,28 +131,28 @@ function parseBackup(text: string): BackupFile {
   try {
     data = JSON.parse(text);
   } catch {
-    throw new BackupError('Ce fichier n’est pas une sauvegarde Scratch World valide');
+    throw new BackupError({ reason: 'invalid-json' });
   }
   const backup = data as Partial<BackupFile> | null;
   if (!backup || backup.format !== BACKUP_FORMAT) {
-    throw new BackupError('Ce fichier n’est pas une sauvegarde Scratch World');
+    throw new BackupError({ reason: 'not-backup' });
   }
   if (typeof backup.version !== 'number' || backup.version > BACKUP_VERSION) {
-    throw new BackupError(
-      `Sauvegarde d’une version plus récente (${String(backup.version)}) : mets l’application à jour`,
-    );
+    throw new BackupError({ reason: 'newer-version', version: String(backup.version) });
   }
   if (backup.storageRes !== STORAGE_RES || backup.chunkRes !== CHUNK_RES) {
-    throw new BackupError(
-      `Résolution incompatible (stockage ${String(backup.storageRes)}, chunk ${String(backup.chunkRes)}) : cette application utilise ${STORAGE_RES} et ${CHUNK_RES}`,
-    );
+    throw new BackupError({
+      reason: 'resolution',
+      found: { storageRes: String(backup.storageRes), chunkRes: String(backup.chunkRes) },
+      expected: { storageRes: STORAGE_RES, chunkRes: CHUNK_RES },
+    });
   }
   if (
     !Array.isArray(backup.chunks) ||
     !Array.isArray(backup.imports) ||
     !Array.isArray(backup.tracks)
   ) {
-    throw new BackupError('Sauvegarde incomplète');
+    throw new BackupError({ reason: 'incomplete' });
   }
   return backup as BackupFile;
 }
@@ -152,7 +165,7 @@ function sortedUnique(pos: Uint16Array): Uint16Array {
   let n = 0;
   for (let i = 0; i < sorted.length; i++) {
     const p = sorted[i] as number;
-    if (p >= CHUNK_CHILDREN) throw new BackupError('Sauvegarde corrompue (position hors chunk)');
+    if (p >= CHUNK_CHILDREN) throw new BackupError({ reason: 'corrupt', part: 'out-of-chunk' });
     if (i === 0 || p !== sorted[i - 1]) sorted[n++] = p;
   }
   return sorted.slice(0, n);

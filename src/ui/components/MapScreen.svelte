@@ -11,7 +11,7 @@
   import type { Recorder } from '../../recording/recorder.svelte';
   import { isDark, settings } from '../state/settings.svelte';
   import { ui } from '../state/ui.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let {
     recorder,
@@ -27,7 +27,7 @@
   let container: HTMLDivElement | undefined = $state();
   let webglMissing = $state(false);
   let locating = $state(false);
-  let locateError = $state<string | null>(null);
+  let locateFailed = $state(false);
   /** Précision (m) de la dernière position trop imprécise pour gratter. */
   let locateAccuracy = $state<number | null>(null);
   // Enregistrement en cours sans aucune cellule : la précision reçue est probablement en cause.
@@ -55,6 +55,10 @@
 
   $effect(() => {
     view?.fog.setHidden(ui.stylePreview);
+  });
+
+  $effect(() => {
+    view?.setPinLabels(S.pinLabels);
   });
 
   onMount(() => {
@@ -91,7 +95,7 @@
   });
 
   async function locate() {
-    locateError = null;
+    locateFailed = false;
     locateAccuracy = null;
     locating = true;
     try {
@@ -105,7 +109,7 @@
       }
     } catch (error) {
       if (error instanceof PositionError && error.status === 'denied') onPermissionDenied();
-      else locateError = S.locateUnavailable;
+      else locateFailed = true;
     } finally {
       locating = false;
     }
@@ -133,7 +137,7 @@
     {#if locating}{S.locating}{:else if impreciseM !== null}
       {S.locateTooImprecise(impreciseM)}
       <button type="button" class="link" onclick={onApproximate}>{S.locateHowTo}</button>
-    {:else if locateError}{locateError}{/if}
+    {:else if locateFailed}{S.locateUnavailable}{/if}
   </p>
 {/if}
 

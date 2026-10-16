@@ -1,6 +1,6 @@
 <script lang="ts">
   import { dismissInstall, installState, promptInstall } from '../../app/install-service.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   const titleId = $props.id();
 </script>

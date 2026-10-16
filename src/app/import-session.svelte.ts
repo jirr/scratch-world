@@ -8,7 +8,8 @@ export class ImportSession {
   state = $state<'idle' | 'running' | 'done'>('idle');
   progress = $state<ImportProgress | null>(null);
   results = $state<ImportResult[]>([]);
-  failure = $state<string | null>(null);
+  /** Le worker a échoué : aucun résultat par fichier n'est disponible. */
+  failed = $state(false);
 
   #api: Comlink.Remote<ImportWorkerApi> | null = null;
 
@@ -17,7 +18,7 @@ export class ImportSession {
     this.state = 'running';
     this.progress = null;
     this.results = [];
-    this.failure = null;
+    this.failed = false;
     const release = acquireBusy('import');
     // new URL(...) est le motif attendu par Vite pour empaqueter un worker (pas un état réactif).
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -33,7 +34,8 @@ export class ImportSession {
         }),
       );
     } catch (error) {
-      this.failure = error instanceof Error ? error.message : 'Import impossible';
+      console.warn('[import] échec du worker', error);
+      this.failed = true;
     } finally {
       worker.terminate();
       this.#api = null;
@@ -50,7 +52,7 @@ export class ImportSession {
     if (this.state === 'done') {
       this.state = 'idle';
       this.results = [];
-      this.failure = null;
+      this.failed = false;
     }
   }
 }

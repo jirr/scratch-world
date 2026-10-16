@@ -20,7 +20,7 @@ import type { Parser } from './types';
 export type ImportPhase = 'hashing' | 'parsing' | 'writing';
 
 export type ImportStatus =
-  'imported' | 'duplicate' | 'unsupported' | 'empty' | 'error' | 'cancelled';
+  'imported' | 'duplicate' | 'unsupported' | 'empty' | 'too-large' | 'error' | 'cancelled';
 
 export interface ImportResult {
   fileName: string;
@@ -29,6 +29,7 @@ export interface ImportResult {
   pointsAccepted: number;
   cellsAdded: number;
   durationMs: number;
+  /** Détail technique d'une erreur inattendue (`status: 'error'`), non traduit. */
   message?: string;
 }
 
@@ -50,11 +51,6 @@ const PARSERS: Record<ImportFormat, Parser> = {
   'google-timeline-ios': parseGoogleTimeline,
 };
 
-const MESSAGES = {
-  unsupported: 'Format non reconnu',
-  empty: 'Aucun point exploitable',
-} as const;
-
 /** Importe un fichier : empreinte → détection → parseur en flux → filtre → cellules → IndexedDB. */
 export async function importFile(
   db: ScratchDb,
@@ -75,10 +71,10 @@ export async function importFile(
   try {
     options.onProgress('hashing', 0);
     const fingerprint = await fingerprintFile(file);
-    if (await db.imports.get(fingerprint)) return result('duplicate', { message: 'Déjà importé' });
+    if (await db.imports.get(fingerprint)) return result('duplicate');
 
     const format = detectFormat(await file.slice(0, DETECT_BYTES).text());
-    if (format === 'unsupported') return result('unsupported', { message: MESSAGES.unsupported });
+    if (format === 'unsupported') return result('unsupported');
 
     const filter = () =>
       new PointFilter({
@@ -142,7 +138,7 @@ export async function importFile(
     await flush();
 
     if (pointsAccepted === 0) {
-      return result('empty', { pointsRead, message: MESSAGES.empty });
+      return result('empty', { pointsRead });
     }
     await db.imports.put({
       fingerprint,
@@ -156,12 +152,7 @@ export async function importFile(
     });
     return result('imported', { pointsRead, pointsAccepted, cellsAdded });
   } catch (error) {
-    const message =
-      error instanceof XmlTooLargeError
-        ? error.message
-        : error instanceof Error
-          ? error.message
-          : 'Erreur inconnue';
-    return result('error', { message });
+    if (error instanceof XmlTooLargeError) return result('too-large');
+    return result('error', error instanceof Error ? { message: error.message } : {});
   }
 }

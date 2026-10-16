@@ -24,6 +24,7 @@
   import PausedBadge from './ui/components/PausedBadge.svelte';
   import StatsPanel from './ui/components/StatsPanel.svelte';
   import UpdateToast from './ui/components/UpdateToast.svelte';
+  import { i18n } from './ui/i18n/i18n.svelte';
   import { initSettings, settings } from './ui/state/settings.svelte';
 
   const recorder = new Recorder({ source: createPositionSource(), db, wakeLock: createWakeLock() });
@@ -41,6 +42,10 @@
 
   $effect(() => {
     document.documentElement.dataset.theme = settings.theme;
+  });
+
+  $effect(() => {
+    document.documentElement.lang = i18n.locale;
   });
 
   $effect(() => {

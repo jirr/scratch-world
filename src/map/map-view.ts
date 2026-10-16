@@ -9,11 +9,11 @@ import { resolveStyleUrl, type Appearance } from './styles';
 setWorkerUrl(workerUrl);
 
 /** Pictogramme de position selon la vitesse : à l'arrêt, à pied, en trottinette, en véhicule. */
-const PIN_ICONS: Record<MoveMode, { icon: string; label: string }> = {
-  idle: { icon: '🧍', label: 'Ta position (à l’arrêt)' },
-  walk: { icon: '🚶', label: 'Ta position (à pied)' },
-  scooter: { icon: '🛴', label: 'Ta position (en trottinette)' },
-  vehicle: { icon: '🚗', label: 'Ta position (en véhicule)' },
+const PIN_ICONS: Record<MoveMode, string> = {
+  idle: '🧍',
+  walk: '🚶',
+  scooter: '🛴',
+  vehicle: '🚗',
 };
 
 const CAMERA_KEY = 'sw:camera';
@@ -55,6 +55,7 @@ export class MapView {
   #marker: Marker | null = null;
   #pin: HTMLDivElement | null = null;
   #styleUrl: string;
+  #pinLabels: Record<MoveMode, string> | null = null;
 
   /** @throws {WebGL2RequiredError} si WebGL2 est indisponible. */
   constructor(container: HTMLElement, appearance: Appearance) {
@@ -100,6 +101,13 @@ export class MapView {
     this.fog.setDark(appearance.dark);
   }
 
+  /** Libellés accessibles du marqueur (langue courante), par mode de déplacement. */
+  setPinLabels(labels: Record<MoveMode, string>): void {
+    this.#pinLabels = labels;
+    const mode = this.#pin?.dataset.mode as MoveMode | undefined;
+    if (mode) this.#pin?.setAttribute('aria-label', labels[mode]);
+  }
+
   /** Place le marqueur de position sans bouger la caméra. */
   setPosition(lng: number, lat: number, mode: MoveMode = 'idle'): void {
     if (!this.#marker) {
@@ -113,8 +121,8 @@ export class MapView {
     if (this.#pin && this.#pin.dataset.mode !== mode) {
       this.#pin.dataset.mode = mode;
       const figure = this.#pin.querySelector('.pin-figure');
-      if (figure) figure.textContent = PIN_ICONS[mode].icon;
-      this.#pin.setAttribute('aria-label', PIN_ICONS[mode].label);
+      if (figure) figure.textContent = PIN_ICONS[mode];
+      if (this.#pinLabels) this.#pin.setAttribute('aria-label', this.#pinLabels[mode]);
     }
     this.#marker.setLngLat([lng, lat]).addTo(this.map);
   }

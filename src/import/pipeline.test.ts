@@ -61,7 +61,7 @@ describe('importFile', () => {
 
   it('refuse un format inconnu', async () => {
     const result = await importFile(db, fixture('unknown.json'), options());
-    expect(result).toMatchObject({ status: 'unsupported', message: 'Format non reconnu' });
+    expect(result.status).toBe('unsupported');
     expect(await db.imports.count()).toBe(0);
   });
 
@@ -78,7 +78,7 @@ describe('importFile', () => {
       'mauvais.json',
     );
     const result = await importFile(db, onlyBad, options());
-    expect(result).toMatchObject({ status: 'empty', message: 'Aucun point exploitable' });
+    expect(result.status).toBe('empty');
     expect(await db.imports.count()).toBe(0);
   });
 

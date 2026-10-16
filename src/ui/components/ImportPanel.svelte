@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { ImportSession } from '../../app/import-session.svelte';
   import type { ImportResult } from '../../import/pipeline';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let { session, open, onClose }: { session: ImportSession; open: boolean; onClose: () => void } =
     $props();
@@ -24,7 +24,8 @@
 
   function describe(result: ImportResult): string {
     if (result.status === 'imported') return S.importAdded(result.cellsAdded);
-    return result.message ?? S.importStatus[result.status];
+    if (result.status === 'error') return S.importError(result.message);
+    return S.importStatus[result.status];
   }
 
   const percent = $derived(session.progress ? Math.round(session.progress.ratio * 100) : 0);
@@ -60,7 +61,7 @@
       <button type="button" onclick={() => session.cancel()}>{S.importCancel}</button>
     </p>
   {:else if session.state === 'done'}
-    {#if session.failure}<p role="alert">{session.failure}</p>{/if}
+    {#if session.failed}<p role="alert">{S.importFailed}</p>{/if}
     <ul class="results" data-testid="import-results">
       {#each session.results as result (result.fileName)}
         <li class={result.status}>
@@ -190,7 +191,8 @@
   }
 
   .results .error span,
-  .results .unsupported span {
+  .results .unsupported span,
+  .results .too-large span {
     color: var(--danger-text);
   }
 </style>

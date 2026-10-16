@@ -2,7 +2,7 @@
   import { isValidStyleUrl, type StyleChoice } from '../../map/styles';
   import { changeSetting, settings } from '../state/settings.svelte';
   import { ui } from '../state/ui.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let open = $state(false);
   const panelId = $props.id();

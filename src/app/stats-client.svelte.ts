@@ -11,7 +11,7 @@ const REFRESH_DEBOUNCE_MS = 3000;
 export class StatsClient {
   stats = $state<Stats | null>(null);
   computing = $state(false);
-  error = $state<string | null>(null);
+  failed = $state(false);
 
   #worker: Worker | null = null;
   #api: Comlink.Remote<StatsWorkerApi> | null = null;
@@ -46,13 +46,15 @@ export class StatsClient {
     const api = this.#api;
     if (!api) return;
     this.computing = true;
-    this.error = null;
+    this.failed = false;
     try {
       const stats = await api.compute();
       if (this.#api === api) this.stats = stats;
     } catch (error) {
-      if (this.#api === api)
-        this.error = error instanceof Error ? error.message : 'Calcul impossible';
+      if (this.#api === api) {
+        console.warn('[stats] échec du calcul', error);
+        this.failed = true;
+      }
     } finally {
       if (this.#api === api) this.computing = false;
     }

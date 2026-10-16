@@ -20,6 +20,31 @@ test('le thème et les réglages sont appliqués et persistés', async ({ page }
   await expect(page.getByLabel(/Conserver les traces brutes/)).toBeChecked();
 });
 
+test.describe('système en anglais', () => {
+  test.use({ locale: 'en-US' });
+
+  test('la langue suit le système et se change dans les réglages', async ({ page }) => {
+    await page.goto('');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.getByRole('button', { name: 'Locate me' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+    await page.getByLabel('Language').selectOption('fr');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+    await expect(page.getByRole('heading', { name: 'Réglages' })).toBeVisible();
+    await expect(page.getByLabel('Langue')).toHaveValue('fr');
+
+    // Mémorisé après rechargement, puis retour à la langue du système.
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Me localiser' })).toBeVisible();
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByLabel('Langue').selectOption('system');
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+});
+
 test('le bouton de la carte recharge l’application après confirmation', async ({ page }) => {
   await page.goto('');
   await page.evaluate(() => ((window as unknown as { __marker: boolean }).__marker = true));

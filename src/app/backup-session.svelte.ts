@@ -1,13 +1,15 @@
 import * as Comlink from 'comlink';
-import { backupFileName } from '../data/backup';
-import type { ImportWorkerApi } from '../workers/import-api';
+import { backupFileName, type BackupFailure } from '../data/backup';
+import type { ImportWorkerApi, RestoreOutcome } from '../workers/import-api';
 import { acquireBusy } from './busy.svelte';
 import { APP_VERSION, GIT_SHA } from './build-info';
 
-export interface BackupMessage {
-  kind: 'success' | 'error';
-  text: string;
-}
+/** Issue de la dernière opération ; le texte est choisi par l'interface (langue courante). */
+export type BackupMessage =
+  | { kind: 'exported' }
+  | { kind: 'restored'; cellsAdded: number }
+  | { kind: 'export-failed' }
+  | { kind: 'restore-failed'; failure: BackupFailure | null };
 
 function download(blob: Blob, name: string): void {
   const url = URL.createObjectURL(blob);
@@ -44,12 +46,10 @@ export class BackupSession {
         api.exportBackup({ includeTracks, app: `${APP_VERSION}+${GIT_SHA}` }),
       );
       download(blob, backupFileName());
-      this.message = { kind: 'success', text: 'Sauvegarde téléchargée' };
+      this.message = { kind: 'exported' };
     } catch (error) {
-      this.message = {
-        kind: 'error',
-        text: error instanceof Error ? error.message : 'Sauvegarde impossible',
-      };
+      console.warn('[backup] échec de la sauvegarde', error);
+      this.message = { kind: 'export-failed' };
     } finally {
       this.working = false;
     }
@@ -60,14 +60,13 @@ export class BackupSession {
     this.message = null;
     const release = acquireBusy('restore');
     try {
-      const r = await this.#withWorker((api) => api.restoreBackup(file));
-      const cells = `${r.cellsAdded} ${r.cellsAdded > 1 ? 'cellules ajoutées' : 'cellule ajoutée'}`;
-      this.message = { kind: 'success', text: `Restauration terminée : ${cells}` };
+      const outcome = await this.#withWorker<RestoreOutcome>((api) => api.restoreBackup(file));
+      this.message = outcome.ok
+        ? { kind: 'restored', cellsAdded: outcome.result.cellsAdded }
+        : { kind: 'restore-failed', failure: outcome.failure };
     } catch (error) {
-      this.message = {
-        kind: 'error',
-        text: error instanceof Error ? error.message : 'Restauration impossible',
-      };
+      console.warn('[backup] échec de la restauration', error);
+      this.message = { kind: 'restore-failed', failure: null };
     } finally {
       release();
       this.working = false;

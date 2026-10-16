@@ -7,6 +7,8 @@ export interface Settings {
   mapStyle: 'auto' | 'liberty' | 'bright' | 'positron' | 'dark' | 'fiord' | 'custom';
   customStyleUrl: string;
   theme: 'system' | 'light' | 'dark';
+  /** 'system' : langue du navigateur (français ou anglais, sinon anglais). */
+  language: 'system' | 'fr' | 'en';
   wakeLockDefault: boolean;
 }
 
@@ -18,6 +20,7 @@ export const DEFAULT_SETTINGS: Settings = {
   mapStyle: 'auto',
   customStyleUrl: '',
   theme: 'system',
+  language: 'system',
   wakeLockDefault: false,
 };
 

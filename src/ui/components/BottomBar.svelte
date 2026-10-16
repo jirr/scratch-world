@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let {
     recording,
@@ -18,7 +18,7 @@
   } = $props();
 </script>
 
-<nav class="bar" aria-label="Navigation principale" data-testid="bottom-bar">
+<nav class="bar" aria-label={S.navLabel} data-testid="bottom-bar">
   <button type="button" onclick={onStats}><span>{S.navStats}</span></button>
   <button type="button" class="fab" class:paused={!recording} onclick={onRecord}>
     <span
