@@ -47,7 +47,7 @@ export default defineConfig({
           {
             // GPU réel, fenêtre visible : mesure de performance locale (jamais en CI).
             name: 'perf',
-            testMatch: /fog\.perf\.ts/,
+            testMatch: /(fog|import)\.perf\.ts/,
             timeout: 300_000,
             use: {
               ...devices['Desktop Chrome'],
