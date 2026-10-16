@@ -42,3 +42,11 @@ test('enregistre des cellules, ignore une position imprécise, puis s’arrête'
   await page.getByRole('button', { name: /Arrêter/ }).click();
   await expect(indicator).toHaveCount(0);
 });
+
+test('la première position dévoile sa cellule sans attendre un déplacement', async ({ page }) => {
+  await page.goto('');
+  await page.getByRole('button', { name: /Enregistrer/ }).click();
+  await page.getByRole('button', { name: 'Démarrer' }).click();
+  const indicator = page.getByTestId('recording-indicator');
+  await expect(indicator).toContainText(/\+1 cellule/, { timeout: 10_000 });
+});

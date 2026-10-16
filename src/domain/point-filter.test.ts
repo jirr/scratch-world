@@ -30,6 +30,19 @@ describe('PointFilter', () => {
     expect(f.accept({ lat: 49, lng: 2 })).toBe('accepted');
   });
 
+  it('tolère une précision plus faible pour le tout premier point seulement', () => {
+    const f = new PointFilter({
+      maxAccuracyM: 50,
+      firstFixMaxAccuracyM: 100,
+      maxSpeedMps: MAX_SPEED_MPS,
+      minDistanceM: MIN_DISTANCE_M,
+      speedWindowS: SPEED_WINDOW_S,
+    });
+    expect(f.accept({ lat: 48, lng: 2, acc: 101 })).toBe('accuracy');
+    expect(f.accept({ lat: 48, lng: 2, acc: 90 })).toBe('accepted');
+    expect(f.accept({ lat: north(1), lng: 2, acc: 90 })).toBe('accuracy');
+  });
+
   it('applique l’ordre invalide > précision > doublon > vitesse', () => {
     const f = make(50);
     f.accept({ lat: 48, lng: 2, t: 1000 });

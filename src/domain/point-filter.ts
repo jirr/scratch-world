@@ -5,6 +5,8 @@ export type FilterResult = 'accepted' | 'invalid' | 'accuracy' | 'duplicate' | '
 
 export interface PointFilterConfig {
   maxAccuracyM: number;
+  /** Seuil de précision du tout premier point accepté (souvent grossier) ; défaut : `maxAccuracyM`. */
+  firstFixMaxAccuracyM?: number;
   maxSpeedMps: number;
   minDistanceM: number;
   speedWindowS: number;
@@ -29,7 +31,10 @@ export class PointFilter {
     ) {
       return 'invalid';
     }
-    if (p.acc !== undefined && p.acc > this.cfg.maxAccuracyM) return 'accuracy';
+    const maxAccuracyM = this.#last
+      ? this.cfg.maxAccuracyM
+      : Math.max(this.cfg.maxAccuracyM, this.cfg.firstFixMaxAccuracyM ?? 0);
+    if (p.acc !== undefined && p.acc > maxAccuracyM) return 'accuracy';
 
     const last = this.#last;
     if (last) {
