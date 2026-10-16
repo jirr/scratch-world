@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { addCells } from '../../data/cell-store';
   import { db } from '../../data/db';
-  import { LOCATE_MAX_ACCURACY_M } from '../../domain/config';
+  import { APPROXIMATE_ACCURACY_M, LOCATE_MAX_ACCURACY_M } from '../../domain/config';
   import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
@@ -10,8 +10,17 @@
   import { isDark, settings } from '../state/settings.svelte';
   import { S } from '../strings';
 
-  let { recorder, onPermissionDenied }: { recorder: Recorder; onPermissionDenied: () => void } =
-    $props();
+  let {
+    recorder,
+    onPermissionDenied,
+    onApproximate,
+    retryToken,
+  }: {
+    recorder: Recorder;
+    onPermissionDenied: () => void;
+    onApproximate: () => void;
+    retryToken: number;
+  } = $props();
   let container: HTMLDivElement | undefined = $state();
   let webglMissing = $state(false);
   let locating = $state(false);
@@ -54,6 +63,15 @@
     if (fix) view?.setPosition(fix.lng, fix.lat);
   });
 
+  // « Réessayer » depuis la fenêtre de localisation approximative.
+  let lastRetry = 0;
+  $effect(() => {
+    if (retryToken !== lastRetry) {
+      lastRetry = retryToken;
+      void locate();
+    }
+  });
+
   async function locate() {
     locateError = null;
     locating = true;
@@ -63,6 +81,8 @@
       // Dévoile une petite zone autour de la position, sans attendre un déplacement.
       if (fix.accuracy <= LOCATE_MAX_ACCURACY_M) {
         await addCells(db, startZoneCells(fix.lat, fix.lng));
+      } else if (fix.accuracy > APPROXIMATE_ACCURACY_M) {
+        onApproximate();
       } else {
         locateError = S.locateTooImprecise(Math.round(fix.accuracy));
       }

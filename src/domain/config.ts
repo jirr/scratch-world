@@ -37,4 +37,6 @@ export const FIRST_FIX_MAX_ACCURACY_M = 250;
 /** Imprécision maximale pour que « Me localiser » gratte la zone de départ. */
 export const LOCATE_MAX_ACCURACY_M = 250;
 /** Rayon (en anneaux de cellules) de la petite zone dévoilée à la première position : 19 cellules ≈ 300 m. */
+/** Au-delà, la précision indique une localisation « approximative » (zone) choisie dans les réglages du système. */
+export const APPROXIMATE_ACCURACY_M = 500;
 export const START_ZONE_RINGS = 2;

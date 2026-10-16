@@ -3,6 +3,7 @@ import { addCells } from '../data/cell-store';
 import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import {
+  APPROXIMATE_ACCURACY_M,
   FIRST_FIX_MAX_ACCURACY_M,
   LIVE_FLUSH_MS,
   MAX_GAP_M,
@@ -32,6 +33,8 @@ export class Recorder {
   cellsAdded = $state(0);
   elapsedMs = $state(0);
   lastFix = $state<PositionFix | null>(null);
+  /** Vrai si les positions reçues sont trop imprécises : probablement une localisation « approximative ». */
+  approximate = $state(false);
 
   #deps: RecorderDeps;
   #filter: PointFilter | null = null;
@@ -81,6 +84,7 @@ export class Recorder {
     this.cellsAdded = 0;
     this.elapsedMs = 0;
     this.lastFix = null;
+    this.approximate = false;
     this.#startedAt = Date.now();
     this.#releaseBusy = acquireBusy('recording');
     this.state = 'recording';
@@ -117,6 +121,7 @@ export class Recorder {
   #onFix(fix: PositionFix): void {
     if (this.state !== 'recording' || !this.#filter) return;
     this.lastFix = fix;
+    this.approximate = fix.accuracy > APPROXIMATE_ACCURACY_M;
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };
     if (this.#filter.accept(point) !== 'accepted') return;
     if (!this.#started) {

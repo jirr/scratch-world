@@ -11,6 +11,7 @@
   import { Recorder } from './recording/recorder.svelte';
   import BottomBar from './ui/components/BottomBar.svelte';
   import ImportPanel from './ui/components/ImportPanel.svelte';
+  import ApproximateNotice from './ui/components/ApproximateNotice.svelte';
   import InstallPrompt from './ui/components/InstallPrompt.svelte';
   import Landing from './ui/components/Landing.svelte';
   import MapScreen from './ui/components/MapScreen.svelte';
@@ -33,9 +34,15 @@
   let statsOpen = $state(false);
   let sheetOpen = $state(false);
   let permissionOpen = $state(false);
+  let approxOpen = $state(false);
+  let retryToken = $state(0);
 
   $effect(() => {
     document.documentElement.dataset.theme = settings.theme;
+  });
+
+  $effect(() => {
+    if (recorder.approximate) approxOpen = true;
   });
 
   $effect(() => {
@@ -54,7 +61,12 @@
 {#if !profile.pseudo}
   <Landing />
 {:else}
-  <MapScreen {recorder} onPermissionDenied={() => (permissionOpen = true)} />
+  <MapScreen
+    {recorder}
+    {retryToken}
+    onPermissionDenied={() => (permissionOpen = true)}
+    onApproximate={() => (approxOpen = true)}
+  />
   <RecordingIndicator {recorder} />
   <BottomBar
     recording={recorder.state === 'recording'}
@@ -66,6 +78,11 @@
   <StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
   <ImportPanel session={importSession} open={importOpen} onClose={() => (importOpen = false)} />
   <RecordingSheet {recorder} open={sheetOpen} onClose={() => (sheetOpen = false)} />
+  <ApproximateNotice
+    open={approxOpen}
+    onRetry={() => retryToken++}
+    onClose={() => (approxOpen = false)}
+  />
   <PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
   <SettingsPanel
     open={menuOpen}
