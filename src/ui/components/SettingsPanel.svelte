@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { busy } from '../../app/busy.svelte';
   import { VERSION_LABEL } from '../../app/build-info';
   import { installState, promptInstall } from '../../app/install-service.svelte';
   import { profile, setPseudo } from '../../app/profile.svelte';
@@ -54,6 +55,11 @@
     updateResult = null;
     updateResult = await checkForUpdate();
     checking = false;
+  }
+
+  function reload() {
+    if (busy.isBusy && !confirm(S.reloadConfirm)) return;
+    location.reload();
   }
 
   async function confirmClear() {
@@ -212,6 +218,9 @@
     <button type="button" onclick={onCheck} disabled={checking}>
       {checking ? S.updateChecking : S.updateCheck}
     </button>
+    <p>
+      <button type="button" onclick={reload}>{S.reload}</button>
+    </p>
     {#if updateResult}<p data-testid="update-check-result">{updateMessages[updateResult]}</p>{/if}
   </section>
 
