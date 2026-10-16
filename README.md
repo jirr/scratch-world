@@ -9,7 +9,15 @@ PWA « carte du monde à gratter » : un brouillard sombre recouvre la carte et 
 
 Application : <https://jirr.github.io/scratch-world/>
 
-> État d'avancement : le projet est livré par jalons (voir les PR). Le jalon 0 pose le dépôt, la CI, le déploiement et le mécanisme de mise à jour de la PWA ; la carte arrive au jalon 1.
+## Fonctionnalités
+
+- Carte du monde voilée d’un brouillard (WebGL2) qui se dissipe sur les zones visitées, nord en haut.
+- **Grattage en direct** avec la géolocalisation du navigateur (application ouverte).
+- **Import** GPX, KML, Google Timeline (Android et iPhone) et `Records.json`.
+- **Statistiques** : surface dévoilée, part du monde émergé, surface par pays.
+- **Sauvegarde / restauration** (fusion), réglages, thèmes clair/sombre, hors ligne, installable.
+
+Résolution H3 10 (arête moyenne ≈ 76 m, aire ≈ 0,015 km² par cellule) ; les cellules sont stockées en chunks binaires par parent H3 de résolution 5 dans IndexedDB.
 
 ## Développement
 
@@ -80,7 +88,7 @@ GitHub Pages impose `Cache-Control: max-age=600` sur tous les fichiers et ce n'e
 - `ci.yml` (push sur `main` et pull requests) : `quality` (lint, typecheck, tests), `build`, `e2e` (Playwright), `lighthouse`.
 - `deploy.yml` : après une CI verte sur `main`, publie sur GitHub Pages **l'artefact `dist` exact produit par la CI** (pas de second build).
 
-Lighthouse 12 n'a plus de catégorie PWA : il audite performance, accessibilité et bonnes pratiques (seuils en avertissement pour l'instant). L'installabilité et le hors-ligne sont vérifiés par Playwright.
+Lighthouse 12 n'a plus de catégorie PWA : il audite performance, accessibilité et bonnes pratiques. Seuils **bloquants** : accessibilité ≥ 0,95, bonnes pratiques ≥ 0,9, performance ≥ 0,35 (médiane mesurée en CI : 0,40 en émulation mobile avec rendu WebGL logiciel, moins 0,05 ; voir [docs/performance.md](docs/performance.md)). L'installabilité et le hors-ligne sont vérifiés par Playwright.
 
 ### Protection de branche recommandée
 
@@ -93,6 +101,11 @@ La géolocalisation et l'installation exigent HTTPS. Options :
 - tester directement sur <https://jirr.github.io/scratch-world/> ;
 - `pnpm build && pnpm preview --host`, puis `cloudflared tunnel --url http://localhost:4173` (les hôtes `*.trycloudflare.com` sont autorisés) ;
 - `mkcert` avec un certificat local installé sur le téléphone.
+
+## Tests et documentation
+
+- Tests unitaires et e2e : voir les scripts ci-dessus (`pnpm test:cov`, `pnpm e2e`) ; mesures de performance : [docs/performance.md](docs/performance.md).
+- Vérification sur appareils réels : [docs/manual-test-checklist.md](docs/manual-test-checklist.md) (**à exécuter sur Android et iPhone**).
 
 ## Limites connues
 
