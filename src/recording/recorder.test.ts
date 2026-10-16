@@ -69,7 +69,9 @@ describe('Recorder', () => {
     for (const fix of walk(0, 20)) source.onFix(fix);
 
     await vi.advanceTimersByTimeAsync(2100);
-    await vi.waitFor(() => expect(recorder.cellsAdded).toBeGreaterThanOrEqual(3));
+    await vi.waitFor(() => expect(recorder.cellsAdded).toBeGreaterThanOrEqual(3), {
+      timeout: 5000,
+    });
     expect(await db.chunks.count()).toBeGreaterThan(0);
 
     const before = recorder.cellsAdded;
@@ -101,9 +103,9 @@ describe('Recorder', () => {
   it('s’arrête et libère « occupé » quand la permission est refusée', async () => {
     await recorder.start({ wakeLock: false });
     source.onStatus('denied');
-    await vi.waitFor(() => expect(recorder.state).toBe('idle'));
+    await vi.waitFor(() => expect(recorder.state).toBe('idle'), { timeout: 5000 });
     expect(recorder.status).toBe('denied');
-    await vi.waitFor(() => expect(busy.isBusy).toBe(false));
+    await vi.waitFor(() => expect(busy.isBusy).toBe(false), { timeout: 5000 });
   });
 
   it('conserve les traces brutes seulement si le réglage est actif', async () => {

@@ -34,7 +34,7 @@ export default defineConfig({
   projects: [
     {
       name: 'app',
-      testMatch: /(app|recording|import|backup|a11y)\.spec\.ts/,
+      testMatch: /(app|recording|import|stats|backup|a11y)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], serviceWorkers: 'block' },
     },
     {
@@ -47,7 +47,7 @@ export default defineConfig({
           {
             // GPU réel, fenêtre visible : mesure de performance locale (jamais en CI).
             name: 'perf',
-            testMatch: /(fog|import)\.perf\.ts/,
+            testMatch: /(fog|import|stats)\.perf\.ts/,
             timeout: 300_000,
             use: {
               ...devices['Desktop Chrome'],

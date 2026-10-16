@@ -59,6 +59,10 @@ Calque custom MapLibre (WebGL2) : un masque hors-écran à demi-résolution accu
 
 Formats : GPX, KML (dont `gx:Track`), Google Timeline Android (`semanticSegments`) et iPhone (tableau en racine), `Records.json`. Les JSON sont lus **en flux** (jamais chargés entièrement), dans `import.worker`. L’import est idempotent : l’empreinte SHA-256 (premier Mio ‖ dernier Mio ‖ taille) détecte un fichier déjà importé. Non gérés : l’ancien « Semantic Location History » (`timelineObjects`) et les archives ZIP Takeout (dézipper d’abord). `pnpm gen:fixtures` régénère les fichiers fictifs de `tests/fixtures/import` ; `--large` produit un `perf/records-large.json` de 200 Mo.
 
+## Statistiques
+
+Surface dévoilée, nombre de cellules, part du **monde émergé** (somme des surfaces des pays Natural Earth 1:50m v5.1.2, domaine public) et surface par pays. Chaque cellule de résolution 7 (~1,4 km) est rattachée à un pays par point-dans-polygone (centre, puis sommets pour les cellules côtières, sinon « mer ») dans `stats.worker` ; le résultat est mis en cache dans la table `regionCache`, invalidée si la version du jeu de données change. `pnpm build:countries` régénère `public/data/countries-50m.v1.json`.
+
 ## Mise à jour de la PWA
 
 Le service worker est enregistré en mode `prompt` : une nouvelle version ne remplace jamais l'ancienne sans accord. L'application vérifie la présence d'une mise à jour au retour au premier plan et toutes les heures, puis affiche « Nouvelle version disponible ». Le toast est **différé tant qu'une opération longue est en cours** (import, enregistrement, restauration). La version affichée (`vX.Y.Z (sha)`) permet de vérifier ce qui tourne.
