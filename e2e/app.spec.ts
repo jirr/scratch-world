@@ -44,3 +44,26 @@ test.describe('géolocalisation accordée', () => {
     await expect(page.getByTestId('stats-cells')).toHaveText('19', { timeout: 15_000 });
   });
 });
+
+test.describe('localisation approximative', () => {
+  test.use({
+    permissions: ['geolocation'],
+    geolocation: { latitude: 48.8584, longitude: 2.2945, accuracy: 3000 },
+  });
+
+  test('« Me localiser » demande de passer en position précise', async ({ page }) => {
+    await page.goto('');
+    await page.getByRole('button', { name: 'Me localiser' }).click();
+    await expect(page.getByTestId('approximate-notice')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Localisation trop approximative' }),
+    ).toBeVisible();
+  });
+
+  test('l’enregistrement affiche aussi la demande', async ({ page }) => {
+    await page.goto('');
+    await page.getByRole('button', { name: /Enregistrer/ }).click();
+    await page.getByRole('button', { name: 'Démarrer' }).click();
+    await expect(page.getByTestId('approximate-notice')).toBeVisible({ timeout: 10_000 });
+  });
+});
