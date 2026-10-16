@@ -15,3 +15,10 @@ export const FALLBACK_SAMPLE_M = 30;
 export const MIN_CELL_PX = 2.5;
 export const TILE_SIZE_PX = 512;
 export const EARTH_CIRCUMFERENCE_M = 40_075_016.686;
+
+/** Rayon du noyau radial du brouillard, en arêtes de cellule (la zone dévoilée ≈ 0,87 arête). */
+export const KERNEL_RADIUS_FACTOR = 1.6;
+/** Échelle du masque hors-écran par rapport au drawing buffer. */
+export const MASK_SCALE = 0.5;
+/** Plafond de mémoire des instances conservées côté GPU/CPU, en octets. */
+export const GPU_CACHE_MAX_BYTES = 32 * 1024 * 1024;

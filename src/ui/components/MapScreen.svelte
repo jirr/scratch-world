@@ -25,6 +25,10 @@
       }
       throw error;
     }
+    if (import.meta.env.MODE === 'bench') {
+      const current = view;
+      void import('../../dev/dev-hooks').then((m) => m.installDevHooks(current));
+    }
     return () => view?.destroy();
   });
 

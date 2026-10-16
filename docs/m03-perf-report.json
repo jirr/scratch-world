@@ -1,0 +1,11 @@
+{
+  "cells": 500000,
+  "frames": 3848,
+  "p50": 4.199999999998909,
+  "p95": 4.299999999999272,
+  "max": 5.5,
+  "longTasksOver50ms": 0,
+  "longTaskMax": 0,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+  "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 Ti (0x00002182) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+}
