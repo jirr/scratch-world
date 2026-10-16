@@ -13,6 +13,7 @@ import {
   SPEED_WINDOW_S,
 } from '../domain/config';
 import { PointFilter } from '../domain/point-filter';
+import { startZoneCells } from '../domain/start-zone';
 import { TrackCellizer, type TrackPoint } from '../domain/track-cellizer';
 import type { PositionFix, PositionSource, PositionStatus } from '../platform/position';
 import type { WakeLock } from '../platform/wake-lock';
@@ -46,6 +47,8 @@ export class Recorder {
   #keepRaw = false;
   #startedAt = 0;
   #seq = 0;
+  /** Vrai une fois la zone de départ dévoilée. */
+  #started = false;
   #flushTimer: ReturnType<typeof setInterval> | null = null;
   #tickTimer: ReturnType<typeof setInterval> | null = null;
   #releaseBusy: (() => void) | null = null;
@@ -74,6 +77,7 @@ export class Recorder {
     this.#pending.clear();
     this.#rawPoints = [];
     this.#seq = 0;
+    this.#started = false;
     this.cellsAdded = 0;
     this.elapsedMs = 0;
     this.lastFix = null;
@@ -115,6 +119,10 @@ export class Recorder {
     this.lastFix = fix;
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };
     if (this.#filter.accept(point) !== 'accepted') return;
+    if (!this.#started) {
+      this.#started = true;
+      for (const cell of startZoneCells(point.lat, point.lng)) this.#pending.add(cell);
+    }
     for (const cell of this.#cellizer.push(point)) this.#pending.add(cell);
     if (this.#keepRaw) this.#rawPoints.push(point);
   }

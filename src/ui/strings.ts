@@ -111,6 +111,9 @@ export const S = {
   navMenu: 'Menu',
   locate: 'Me localiser',
   locating: 'Localisation en cours…',
+  locateTooImprecise: (m: number) =>
+    `Position trop imprécise (±${m} m) : la zone n’a pas été dévoilée. Réessaie à l’extérieur.`,
+  accuracy: 'précision',
   locateUnavailable: 'Position indisponible pour le moment.',
   close: 'Fermer',
   storagePersisted: 'Stockage persistant : oui',
