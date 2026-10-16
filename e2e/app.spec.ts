@@ -53,10 +53,15 @@ test.describe('localisation imprécise', () => {
 
   test('« Me localiser » affiche le message avec le lien vers l’aide, sans pop-up automatique', async ({
     page,
+    context,
   }) => {
     await page.goto('');
     await page.getByRole('button', { name: 'Me localiser' }).click();
-    await expect(page.getByRole('status')).toContainText('Position trop imprécise (±3000 m)');
+    // L'enregistrement automatique observe déjà la position : on la fait bouger pour réveiller Chromium.
+    await context.setGeolocation({ latitude: 48.8585, longitude: 2.2945, accuracy: 3000 });
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Position trop imprécise (±3000 m)' }),
+    ).toBeVisible();
     await expect(page.getByTestId('approximate-notice')).toBeHidden();
 
     await page.getByRole('button', { name: /comment activer la localisation précise/ }).click();
@@ -70,8 +75,6 @@ test.describe('localisation imprécise', () => {
     page,
   }) => {
     await page.goto('');
-    await page.getByRole('button', { name: /Enregistrer/ }).click();
-    await page.getByRole('button', { name: 'Démarrer' }).click();
     await expect(
       page.getByRole('status').filter({ hasText: 'Position trop imprécise' }),
     ).toBeVisible({

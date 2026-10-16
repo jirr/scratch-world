@@ -2,7 +2,7 @@
   import type { Recorder } from '../../recording/recorder.svelte';
   import { S } from '../strings';
 
-  let { recorder }: { recorder: Recorder } = $props();
+  let { recorder, paused }: { recorder: Recorder; paused: boolean } = $props();
 
   const clock = (ms: number) => {
     const total = Math.floor(ms / 1000);
@@ -11,7 +11,11 @@
   };
 </script>
 
-{#if recorder.state === 'recording'}
+{#if recorder.state !== 'recording' && paused}
+  <div class="indicator" role="status" data-testid="paused-indicator">
+    <span>⏸ {S.paused}</span>
+  </div>
+{:else if recorder.state === 'recording'}
   <div class="indicator" role="status" data-testid="recording-indicator">
     <span class="dot" aria-hidden="true"></span>
     <span

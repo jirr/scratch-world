@@ -3,12 +3,14 @@
 
   let {
     recording,
+    paused,
     onRecord,
     onImport,
     onStats,
     onMenu,
   }: {
     recording: boolean;
+    paused: boolean;
     onRecord: () => void;
     onImport: () => void;
     onStats: () => void;
@@ -18,8 +20,10 @@
 
 <nav class="bar" aria-label="Navigation principale" data-testid="bottom-bar">
   <button type="button" onclick={onStats}><span>{S.navStats}</span></button>
-  <button type="button" class="fab" class:active={recording} onclick={onRecord}>
-    <span>{recording ? `■ ${S.recordStop}` : `● ${S.navRecord}`}</span>
+  <button type="button" class="fab" class:paused={!recording} onclick={onRecord}>
+    <span
+      >{recording ? `⏸ ${S.recordPause}` : `▶ ${paused ? S.recordResume : S.recordStartNow}`}</span
+    >
   </button>
   <button type="button" onclick={onImport}><span>{S.navImport}</span></button>
   <button type="button" onclick={onMenu}><span>{S.navMenu}</span></button>
@@ -56,9 +60,9 @@
     font-weight: 600;
   }
 
-  .fab.active {
-    background: var(--danger);
-    border-color: var(--danger);
-    color: #fff;
+  .fab.paused {
+    background: var(--surface);
+    color: var(--fg);
+    border-color: var(--accent);
   }
 </style>

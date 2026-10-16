@@ -1,4 +1,3 @@
-import { acquireBusy } from '../app/busy.svelte';
 import { addCells } from '../data/cell-store';
 import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
@@ -51,7 +50,6 @@ export class Recorder {
   #started = false;
   #flushTimer: ReturnType<typeof setInterval> | null = null;
   #tickTimer: ReturnType<typeof setInterval> | null = null;
-  #releaseBusy: (() => void) | null = null;
   #flushing: Promise<void> = Promise.resolve();
 
   constructor(deps: RecorderDeps) {
@@ -82,7 +80,6 @@ export class Recorder {
     this.elapsedMs = 0;
     this.lastFix = null;
     this.#startedAt = Date.now();
-    this.#releaseBusy = acquireBusy('recording');
     this.state = 'recording';
 
     this.#flushTimer = setInterval(() => void this.#flush(), LIVE_FLUSH_MS);
@@ -105,8 +102,6 @@ export class Recorder {
     await this.#deps.source.stop();
     await this.#flush();
     await this.#deps.wakeLock.disable();
-    this.#releaseBusy?.();
-    this.#releaseBusy = null;
   }
 
   #onStatus(status: PositionStatus): void {
