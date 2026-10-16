@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let { open, onRetry, onClose }: { open: boolean; onRetry: () => void; onClose: () => void } =
     $props();

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { applyUpdate, dismissUpdate, updateState } from '../../app/update-service.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 </script>
 
 {#if updateState.visible}

@@ -16,6 +16,7 @@ Application : <https://jirr.github.io/scratch-world/>
 - **Import** GPX, KML, Google Timeline (Android et iPhone) et `Records.json`.
 - **Statistiques** : surface dévoilée, part du monde émergé, surface par pays.
 - **Sauvegarde / restauration** (fusion), réglages, thèmes clair/sombre, hors ligne, installable.
+- **Français et anglais** : langue du système par défaut (anglais si elle n’est ni le français ni l’anglais), modifiable dans les réglages.
 
 Résolution H3 10 (arête moyenne ≈ 76 m, aire ≈ 0,015 km² par cellule) ; les cellules sont stockées en chunks binaires par parent H3 de résolution 5 dans IndexedDB.
 
@@ -73,7 +74,9 @@ Surface dévoilée, nombre de cellules, part du **monde émergé** (somme des su
 
 ## Sauvegarde et réglages
 
-Réglages > Données : **Sauvegarder** télécharge `scratch-world-AAAA-MM-JJ.json.gz` (cellules, imports, et traces brutes si la case est cochée) ; **Restaurer** _fusionne_ (union des cellules, jamais de suppression) et refuse un fichier d’une version plus récente ou d’une autre résolution ; **Tout effacer** demande confirmation (focus sur Annuler) et conserve les réglages. Réglages : précision maximale (10–200 m), traces brutes (désactivées par défaut), thème, style de carte (OpenFreeMap ou URL https personnalisée), écran allumé par défaut.
+Réglages > Données : **Sauvegarder** télécharge `scratch-world-AAAA-MM-JJ.json.gz` (cellules, imports, et traces brutes si la case est cochée) ; **Restaurer** _fusionne_ (union des cellules, jamais de suppression) et refuse un fichier d’une version plus récente ou d’une autre résolution ; **Tout effacer** demande confirmation (focus sur Annuler) et conserve les réglages. Réglages : précision maximale (10–200 m), traces brutes (désactivées par défaut), thème, langue (système, français ou anglais), style de carte (OpenFreeMap ou URL https personnalisée), écran allumé par défaut.
+
+Les textes de l’interface sont dans `src/ui/i18n/` : `fr.ts` définit la structure (`Messages`), `en.ts` doit la respecter (vérifié par TypeScript).
 
 ## Mise à jour de la PWA
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { busy } from '../../app/busy.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let dialog: HTMLDialogElement | undefined = $state();
   const titleId = $props.id();

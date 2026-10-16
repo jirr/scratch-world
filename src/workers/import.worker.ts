@@ -1,5 +1,5 @@
 import * as Comlink from 'comlink';
-import { createBackup, restoreBackup } from '../data/backup';
+import { BackupError, createBackup, restoreBackup } from '../data/backup';
 import { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import { importFile, type ImportResult } from '../import/pipeline';
@@ -29,7 +29,14 @@ const api: ImportWorkerApi = {
     return results;
   },
   exportBackup: (options) => createBackup(db, options),
-  restoreBackup: (file) => restoreBackup(db, file),
+  async restoreBackup(file) {
+    try {
+      return { ok: true, result: await restoreBackup(db, file) };
+    } catch (error) {
+      if (error instanceof BackupError) return { ok: false, failure: error.failure };
+      throw error;
+    }
+  },
   cancel() {
     cancelled = true;
   },

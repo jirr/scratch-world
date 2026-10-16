@@ -1,7 +1,7 @@
 <script lang="ts">
   import { installState, promptInstall } from '../../app/install-service.svelte';
   import { PSEUDO_MAX, PSEUDO_MIN, setPseudo } from '../../app/profile.svelte';
-  import { S } from '../strings';
+  import { S } from '../i18n/i18n.svelte';
 
   let value = $state('');
   let invalid = $state(false);

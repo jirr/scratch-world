@@ -15,6 +15,8 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // L'interface suit la langue du système : les tests (textes français) fixent le français.
+    locale: 'fr-FR',
     // Pseudo déjà choisi : les tests ne passent pas par la page d'accueil (sauf landing.spec.ts).
     storageState: {
       cookies: [],

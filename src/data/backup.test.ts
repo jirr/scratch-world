@@ -137,38 +137,52 @@ describe('sauvegarde / restauration', () => {
   };
 
   it.each([
-    ['une version plus récente', { ...base, version: 2 }, /plus récente/],
+    [
+      'une version plus récente',
+      { ...base, version: 2 },
+      { reason: 'newer-version', version: '2' },
+    ],
     [
       'une résolution de stockage différente',
       { ...base, storageRes: 11 },
-      /Résolution incompatible/,
+      {
+        reason: 'resolution',
+        found: { storageRes: '11', chunkRes: '5' },
+        expected: { storageRes: 10, chunkRes: 5 },
+      },
     ],
-    ['une résolution de chunk différente', { ...base, chunkRes: 4 }, /Résolution incompatible/],
-    ['un autre format', { ...base, format: 'autre' }, /pas une sauvegarde/],
+    [
+      'une résolution de chunk différente',
+      { ...base, chunkRes: 4 },
+      { reason: 'resolution', found: { storageRes: '10', chunkRes: '4' } },
+    ],
+    ['un autre format', { ...base, format: 'autre' }, { reason: 'not-backup' }],
     [
       'une sauvegarde sans tableaux',
       { format: BACKUP_FORMAT, version: 1, storageRes: 10, chunkRes: 5 },
-      /incomplète/,
+      { reason: 'incomplete' },
     ],
     [
       'des positions corrompues',
       { ...base, chunks: [{ key: '85283473fffffff', pos: 'AAAA', areaKm2: 1 }] },
-      /corrompue/,
+      { reason: 'corrupt', part: 'positions' },
     ],
     [
       'une position hors chunk',
       { ...base, chunks: [{ key: '85283473fffffff', pos: '//8=', areaKm2: 1 }] },
-      /hors chunk/,
+      { reason: 'corrupt', part: 'out-of-chunk' },
     ],
-  ])('refuse %s', async (_name, data, message) => {
-    await expect(restoreBackup(target, asJsonFile(data))).rejects.toThrow(message);
+  ])('refuse %s', async (_name, data, failure) => {
+    await expect(restoreBackup(target, asJsonFile(data))).rejects.toMatchObject({ failure });
     expect(await target.chunks.count()).toBe(0);
   });
 
   it('refuse un fichier qui n’est pas du JSON', async () => {
-    await expect(restoreBackup(target, new File(['pas du json'], 'x.json'))).rejects.toBeInstanceOf(
-      BackupError,
+    const error: unknown = await restoreBackup(target, new File(['pas du json'], 'x.json')).catch(
+      (e: unknown) => e,
     );
+    expect(error).toBeInstanceOf(BackupError);
+    expect(error).toMatchObject({ failure: { reason: 'invalid-json' } });
   });
 
   it('nomme le fichier avec la date du jour', () => {
