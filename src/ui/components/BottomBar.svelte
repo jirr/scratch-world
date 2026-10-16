@@ -4,8 +4,14 @@
   let {
     recording,
     onRecord,
+    onImport,
     onMenu,
-  }: { recording: boolean; onRecord: () => void; onMenu: () => void } = $props();
+  }: {
+    recording: boolean;
+    onRecord: () => void;
+    onImport: () => void;
+    onMenu: () => void;
+  } = $props();
 </script>
 
 <nav class="bar" aria-label="Navigation principale" data-testid="bottom-bar">
@@ -15,9 +21,7 @@
   <button type="button" class="fab" class:active={recording} onclick={onRecord}>
     <span>{recording ? `■ ${S.recordStop}` : `● ${S.navRecord}`}</span>
   </button>
-  <button type="button" aria-disabled="true" title={S.soon}>
-    <span>{S.navImport}</span><small>{S.soon}</small>
-  </button>
+  <button type="button" onclick={onImport}><span>{S.navImport}</span></button>
   <button type="button" onclick={onMenu}><span>{S.navMenu}</span></button>
 </nav>
 
