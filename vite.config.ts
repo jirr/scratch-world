@@ -47,8 +47,8 @@ export default defineConfig({
         orientation: 'any',
         start_url: base,
         scope: base,
-        theme_color: '#0c0e14',
-        background_color: '#0c0e14',
+        theme_color: '#161b26',
+        background_color: '#161b26',
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],

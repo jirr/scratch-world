@@ -26,6 +26,6 @@ export function isValidStyleUrl(value: string): boolean {
 /** `auto` : style sombre en thème sombre, clair sinon ; une URL personnalisée invalide retombe sur `auto`. */
 export function resolveStyleUrl({ style, customStyleUrl, dark }: Appearance): string {
   if (style === 'custom' && isValidStyleUrl(customStyleUrl)) return customStyleUrl;
-  if (style === 'auto' || style === 'custom') return styleUrl(dark ? 'dark' : 'liberty');
+  if (style === 'auto' || style === 'custom') return styleUrl(dark ? 'fiord' : 'liberty');
   return styleUrl(style);
 }
