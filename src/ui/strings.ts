@@ -43,6 +43,14 @@ export const S = {
   clearConfirm: 'Effacer définitivement',
   clearDone: 'Données effacées',
   settingsAbout: 'À propos',
+  installTitle: 'Installer Scratch World',
+  installBody:
+    'Ajoute l’application à ton écran d’accueil : elle s’ouvre en plein écran et fonctionne hors ligne.',
+  installIosBody:
+    'Sur iPhone : touche le bouton Partager de Safari, puis « Sur l’écran d’accueil ».',
+  installAction: 'Installer',
+  installLater: 'Plus tard',
+  installMenu: 'Installer l’application',
   statsTitle: 'Statistiques',
   statsArea: 'Surface dévoilée',
   statsCells: 'Cellules',
