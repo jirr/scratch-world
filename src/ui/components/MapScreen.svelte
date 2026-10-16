@@ -3,6 +3,7 @@
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
   import type { Recorder } from '../../recording/recorder.svelte';
+  import { isDark, settings } from '../state/settings.svelte';
   import { S } from '../strings';
 
   let { recorder, onPermissionDenied }: { recorder: Recorder; onPermissionDenied: () => void } =
@@ -11,14 +12,24 @@
   let webglMissing = $state(false);
   let locating = $state(false);
   let locateError = $state<string | null>(null);
-  let view: MapView | null = null;
+  let view = $state.raw<MapView | null>(null);
 
   const positionSource = createPositionSource();
+
+  const currentAppearance = () => ({
+    style: settings.mapStyle,
+    customStyleUrl: settings.customStyleUrl,
+    dark: isDark(),
+  });
+
+  $effect(() => {
+    view?.setAppearance(currentAppearance());
+  });
 
   onMount(() => {
     if (!container) return;
     try {
-      view = new MapView(container);
+      view = new MapView(container, currentAppearance());
     } catch (error) {
       if (error instanceof WebGL2RequiredError) {
         webglMissing = true;
