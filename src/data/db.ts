@@ -42,12 +42,20 @@ export interface MetaRow {
   value: unknown;
 }
 
+export interface RegionCacheRow {
+  /** Cellule H3 de résolution 7. */
+  cell: string;
+  /** Code pays, ou `''` pour la mer. */
+  country: string;
+}
+
 export class ScratchDb extends Dexie {
   chunks!: Table<ChunkRow, string>;
   imports!: Table<ImportRow, string>;
   tracks!: Table<TrackRow, number>;
   settings!: Table<SettingRow, string>;
   meta!: Table<MetaRow, string>;
+  regionCache!: Table<RegionCacheRow, string>;
 
   constructor(name = 'scratch-world') {
     super(name);
@@ -59,6 +67,7 @@ export class ScratchDb extends Dexie {
       settings: 'key',
       meta: 'key',
     });
+    this.version(2).stores({ regionCache: 'cell' });
   }
 }
 

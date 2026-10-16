@@ -2,9 +2,13 @@ import Dexie from 'dexie';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ScratchDb } from './db';
 import * as v1 from './schema/v1';
+import * as v2 from './schema/v2';
 
 /** Un instantané par version de schéma, de la plus ancienne à la plus récente. */
-const snapshots = [{ version: 1, ...v1 }];
+const snapshots = [
+  { version: 1, ...v1 },
+  { version: 2, ...v2 },
+];
 const CURRENT_VERSION = snapshots.length;
 
 const opened: Dexie[] = [];
