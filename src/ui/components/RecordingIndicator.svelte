@@ -14,7 +14,11 @@
 {#if recorder.state === 'recording'}
   <div class="indicator" role="status" data-testid="recording-indicator">
     <span class="dot" aria-hidden="true"></span>
-    <span>{S.recording} · {clock(recorder.elapsedMs)} · +{recorder.cellsAdded} {S.cells}</span>
+    <span
+      >{S.recording} · {clock(recorder.elapsedMs)} · +{recorder.cellsAdded}
+      {S.cells}{#if recorder.cellsAdded === 0 && recorder.lastFix}
+        · {S.accuracy} ±{Math.round(recorder.lastFix.accuracy)} m{/if}</span
+    >
   </div>
 {/if}
 

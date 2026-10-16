@@ -1,5 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { addCells } from '../../data/cell-store';
+  import { db } from '../../data/db';
+  import { LOCATE_MAX_ACCURACY_M } from '../../domain/config';
+  import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
   import type { Recorder } from '../../recording/recorder.svelte';
@@ -56,6 +60,12 @@
     try {
       const fix = await positionSource.getCurrent();
       view?.showPosition(fix.lng, fix.lat);
+      // Dévoile une petite zone autour de la position, sans attendre un déplacement.
+      if (fix.accuracy <= LOCATE_MAX_ACCURACY_M) {
+        await addCells(db, startZoneCells(fix.lat, fix.lng));
+      } else {
+        locateError = S.locateTooImprecise(Math.round(fix.accuracy));
+      }
     } catch (error) {
       if (error instanceof PositionError && error.status === 'denied') onPermissionDenied();
       else locateError = S.locateUnavailable;

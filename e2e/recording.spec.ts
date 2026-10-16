@@ -35,7 +35,7 @@ test('enregistre des cellules, ignore une position imprécise, puis s’arrête'
 
   await page.waitForTimeout(2500);
   const before = await count();
-  await context.setGeolocation({ latitude: 49.5, longitude: 2.35, accuracy: 200 });
+  await context.setGeolocation({ latitude: 49.5, longitude: 2.35, accuracy: 600 });
   await page.waitForTimeout(3000);
   expect(await count()).toBe(before);
 
@@ -48,5 +48,5 @@ test('la première position dévoile sa cellule sans attendre un déplacement', 
   await page.getByRole('button', { name: /Enregistrer/ }).click();
   await page.getByRole('button', { name: 'Démarrer' }).click();
   const indicator = page.getByTestId('recording-indicator');
-  await expect(indicator).toContainText(/\+1 cellule/, { timeout: 10_000 });
+  await expect(indicator).toContainText(/\+19\s+cellules/, { timeout: 10_000 });
 });

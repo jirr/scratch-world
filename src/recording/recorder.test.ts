@@ -86,25 +86,25 @@ describe('Recorder', () => {
 
   it('ignore une position trop imprécise', async () => {
     await recorder.start({ wakeLock: false });
-    source.onFix(walk(0, 1, 200)[0] as PositionFix);
+    source.onFix(walk(0, 1, 300)[0] as PositionFix);
     await recorder.stop();
     expect(recorder.cellsAdded).toBe(0);
     expect(await db.chunks.count()).toBe(0);
   });
 
-  it('le premier point, un peu imprécis, dévoile sa cellule sans attendre un déplacement', async () => {
+  it('le premier point, un peu imprécis, dévoile une petite zone sans attendre un déplacement', async () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 80)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBe(1);
+    expect(recorder.cellsAdded).toBe(19);
   });
 
   it('utilise le seuil de précision des réglages', async () => {
-    await setSetting(db, 'accuracyThresholdM', 250);
+    await setSetting(db, 'accuracyThresholdM', 400);
     await recorder.start({ wakeLock: false });
-    source.onFix(walk(0, 1, 200)[0] as PositionFix);
+    source.onFix(walk(0, 1, 300)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBe(1);
+    expect(recorder.cellsAdded).toBe(19);
   });
 
   it('s’arrête et libère « occupé » quand la permission est refusée', async () => {
