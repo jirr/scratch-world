@@ -1,6 +1,8 @@
 import { GPUInitializationError, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { installDebugOverlay } from './fog/debug-overlay';
+import { FogLayer } from './fog/fog-layer';
 import { autoStyleUrl } from './styles';
 
 setWorkerUrl(workerUrl);
@@ -39,9 +41,14 @@ export class WebGL2RequiredError extends Error {
 
 export class MapView {
   readonly map: MapLibreMap;
+  readonly fog: FogLayer;
+  #removeOverlay: (() => void) | null = null;
   #marker: Marker | null = null;
   #colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
-  #onSchemeChange = () => this.map.setStyle(autoStyleUrl(this.#colorScheme.matches));
+  #onSchemeChange = () => {
+    this.map.setStyle(autoStyleUrl(this.#colorScheme.matches));
+    this.fog.setDark(this.#colorScheme.matches);
+  };
 
   /** @throws {WebGL2RequiredError} si WebGL2 est indisponible. */
   constructor(container: HTMLElement) {
@@ -63,6 +70,11 @@ export class MapView {
       if (error instanceof GPUInitializationError) throw new WebGL2RequiredError();
       throw error;
     }
+    this.fog = new FogLayer(this.map, this.#colorScheme.matches);
+    this.map.on('style.load', () => this.fog.attach());
+    if (new URLSearchParams(location.search).get('debug') === '1') {
+      this.#removeOverlay = installDebugOverlay(this.fog);
+    }
     this.map.touchZoomRotate.disableRotation();
     this.map.keyboard.disableRotation();
     this.map.on('moveend', () => {
@@ -80,6 +92,8 @@ export class MapView {
 
   destroy(): void {
     this.#colorScheme.removeEventListener('change', this.#onSchemeChange);
+    this.#removeOverlay?.();
     this.map.remove();
+    this.fog.destroy();
   }
 }
