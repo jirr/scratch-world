@@ -106,11 +106,14 @@ export class MapView {
       this.#pin = document.createElement('div');
       this.#pin.className = 'pin';
       this.#pin.setAttribute('role', 'img');
+      this.#pin.innerHTML =
+        '<span class="pin-ring"></span><span class="pin-shadow"></span><span class="pin-figure"></span>';
       this.#marker = new Marker({ element: this.#pin, anchor: 'center' });
     }
     if (this.#pin && this.#pin.dataset.mode !== mode) {
       this.#pin.dataset.mode = mode;
-      this.#pin.textContent = PIN_ICONS[mode].icon;
+      const figure = this.#pin.querySelector('.pin-figure');
+      if (figure) figure.textContent = PIN_ICONS[mode].icon;
       this.#pin.setAttribute('aria-label', PIN_ICONS[mode].label);
     }
     this.#marker.setLngLat([lng, lat]).addTo(this.map);

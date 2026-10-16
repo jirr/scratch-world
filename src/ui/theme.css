@@ -116,10 +116,95 @@ dialog.sheet::backdrop {
   }
 }
 
-/* Pictogramme de position (bonhomme à pied / trottinette / véhicule). */
+/* Personnage de position, style « 3D » : disque au sol, ombre, figure qui flotte et rebondit en mouvement. */
 .pin {
-  font-size: 30px;
-  line-height: 1;
-  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 0.6));
+  position: relative;
+  width: 96px;
+  height: 96px;
   user-select: none;
+  pointer-events: none;
+}
+
+.pin-ring {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 84px;
+  height: 84px;
+  margin-left: -42px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(95 208 168 / 0.1) 40%, rgb(95 208 168 / 0.55) 100%);
+  border: 2px solid rgb(255 255 255 / 0.85);
+  transform: rotateX(62deg);
+  box-shadow: 0 0 14px rgb(95 208 168 / 0.8);
+  animation: pin-pulse 2s ease-in-out infinite;
+}
+
+.pin-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: 44px;
+  height: 14px;
+  margin-left: -22px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0) 70%);
+}
+
+.pin-figure {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  text-align: center;
+  font-size: 60px;
+  line-height: 1;
+  transform-origin: 50% 100%;
+  transform: perspective(240px) rotateX(8deg);
+  filter: drop-shadow(0 6px 3px rgb(0 0 0 / 0.5)) drop-shadow(0 0 2px rgb(255 255 255 / 0.9));
+}
+
+.pin[data-mode='walk'] .pin-figure {
+  animation: pin-walk 0.6s ease-in-out infinite;
+}
+
+.pin[data-mode='scooter'] .pin-figure {
+  animation: pin-glide 0.9s ease-in-out infinite;
+}
+
+.pin[data-mode='vehicle'] .pin-figure {
+  animation: pin-glide 0.5s ease-in-out infinite;
+}
+
+@keyframes pin-walk {
+  0%,
+  100% {
+    transform: perspective(240px) rotateX(8deg) translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: perspective(240px) rotateX(8deg) translateY(-7px) rotate(4deg);
+  }
+}
+
+@keyframes pin-glide {
+  0%,
+  100% {
+    transform: perspective(240px) rotateX(8deg) translateY(0);
+  }
+  50% {
+    transform: perspective(240px) rotateX(8deg) translateY(-3px);
+  }
+}
+
+@keyframes pin-pulse {
+  50% {
+    transform: rotateX(62deg) scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-figure,
+  .pin-ring {
+    animation: none !important;
+  }
 }

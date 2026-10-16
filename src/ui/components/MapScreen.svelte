@@ -151,7 +151,7 @@
   .status {
     position: fixed;
     left: 12px;
-    top: calc(56px + env(safe-area-inset-top));
+    top: calc(12px + env(safe-area-inset-top));
     margin: 0;
     z-index: 5;
     color: var(--fg);
