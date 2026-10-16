@@ -35,6 +35,7 @@
   let sheetOpen = $state(false);
   let permissionOpen = $state(false);
   let approxOpen = $state(false);
+  let approxShown = false;
   let retryToken = $state(0);
 
   $effect(() => {
@@ -42,7 +43,11 @@
   });
 
   $effect(() => {
-    if (recorder.approximate) approxOpen = true;
+    // Une seule fois par session : pas de fenêtre en boucle.
+    if (recorder.approximate && !approxShown) {
+      approxShown = true;
+      approxOpen = true;
+    }
   });
 
   $effect(() => {
