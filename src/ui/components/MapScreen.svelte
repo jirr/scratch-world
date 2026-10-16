@@ -4,6 +4,7 @@
   import { db } from '../../data/db';
   import { LOCATE_MAX_ACCURACY_M } from '../../domain/config';
   import { moveMode } from '../../domain/speed-mode';
+  import { discoveryRadiusM } from '../../domain/discovery';
   import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
@@ -98,7 +99,7 @@
       view?.showPosition(fix.lng, fix.lat);
       // Dévoile une petite zone autour de la position, sans attendre un déplacement.
       if (fix.accuracy <= LOCATE_MAX_ACCURACY_M) {
-        await addCells(db, startZoneCells(fix.lat, fix.lng));
+        await addCells(db, startZoneCells(fix.lat, fix.lng, discoveryRadiusM('idle')));
       } else {
         locateAccuracy = Math.round(fix.accuracy);
       }

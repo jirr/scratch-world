@@ -26,7 +26,7 @@ async function readCells(page: Page): Promise<number> {
   return value;
 }
 
-test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoile un disque de ~1 km', async ({
+test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoile un petit cercle à pied', async ({
   page,
   context,
 }) => {
@@ -39,9 +39,9 @@ test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoi
   await expect(page.getByTestId('recording-indicator')).toHaveCount(0);
   await expect(page.getByText(/Enregistrement ·/)).toHaveCount(0);
 
-  await expect.poll(() => readCells(page), { timeout: 15_000 }).toBeGreaterThan(190);
+  await expect.poll(() => readCells(page), { timeout: 15_000 }).toBeGreaterThanOrEqual(3);
   const start = await readCells(page);
-  expect(start).toBeLessThan(260);
+  expect(start).toBeLessThan(15);
 
   for (let i = 1; i <= 12; i++) {
     await context.setGeolocation({ ...START, latitude: START.latitude + i * STEP_DEG });

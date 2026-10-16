@@ -34,12 +34,8 @@ export const LIVE_FLUSH_MS = 2000;
 
 /** Imprécision maximale des positions du direct : la zone de découverte (~1 km) absorbe l'erreur. */
 export const LIVE_MAX_ACCURACY_M = 1000;
-/** Une nouvelle zone de découverte est dévoilée quand on s'éloigne de la précédente d'au moins cette distance. */
-export const DISCOVERY_REFRESH_M = 200;
 /** Imprécision maximale pour que « Me localiser » gratte la zone de départ. */
-export const LOCATE_MAX_ACCURACY_M = 1000;
-/** Rayon (m) de la zone de découverte, dévoilée en disque autour de la position. */
-export const DISCOVERY_RADIUS_M = 1000;
+export const LOCATE_MAX_ACCURACY_M = 300;
 
 /** « Me localiser » s'arrête dès qu'une position est au moins aussi précise... */
 export const GOOD_ACCURACY_M = 100;

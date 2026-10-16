@@ -2,7 +2,6 @@ import { addCells } from '../data/cell-store';
 import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import {
-  DISCOVERY_REFRESH_M,
   LIVE_MAX_ACCURACY_M,
   LIVE_FLUSH_MS,
   MAX_GAP_M,
@@ -13,8 +12,9 @@ import {
   SPEED_WINDOW_S,
 } from '../domain/config';
 import { PointFilter } from '../domain/point-filter';
+import { discoveryRadiusM, maxAccuracyForRadius, refreshDistanceM } from '../domain/discovery';
 import { haversineM } from '../domain/geo';
-import { SpeedTracker } from '../domain/speed-mode';
+import { moveMode, SpeedTracker } from '../domain/speed-mode';
 import { startZoneCells } from '../domain/start-zone';
 import { TrackCellizer, type TrackPoint } from '../domain/track-cellizer';
 import type { PositionFix, PositionSource, PositionStatus } from '../platform/position';
@@ -113,16 +113,19 @@ export class Recorder {
     if (this.state !== 'recording' || !this.#filter) return;
     this.lastFix = fix;
     this.speedMps = this.#speed.push(fix);
+    // Rayon de découverte selon la vitesse : petit à pied (détail du chemin), large en véhicule.
+    const radiusM = discoveryRadiusM(moveMode(this.speedMps));
+    if (fix.accuracy > maxAccuracyForRadius(radiusM)) return;
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };
     if (this.#filter.accept(point) !== 'accepted') return;
-    // Zone de découverte (~1 km) : dévoilée à la première position, puis à chaque éloignement notable.
+    // Zone dévoilée à la première position, puis à chaque éloignement notable.
     const lastZone = this.#lastZone;
     if (
       !lastZone ||
-      haversineM(lastZone.lat, lastZone.lng, point.lat, point.lng) >= DISCOVERY_REFRESH_M
+      haversineM(lastZone.lat, lastZone.lng, point.lat, point.lng) >= refreshDistanceM(radiusM)
     ) {
       this.#lastZone = { lat: point.lat, lng: point.lng };
-      for (const cell of startZoneCells(point.lat, point.lng)) this.#pending.add(cell);
+      for (const cell of startZoneCells(point.lat, point.lng, radiusM)) this.#pending.add(cell);
     }
     for (const cell of this.#cellizer.push(point)) this.#pending.add(cell);
     if (this.#keepRaw) this.#rawPoints.push(point);

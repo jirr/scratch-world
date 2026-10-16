@@ -39,9 +39,9 @@ test.describe('géolocalisation accordée', () => {
     await page.getByRole('button', { name: 'Me localiser' }).click();
     await expect(page.locator('.maplibregl-marker')).toBeVisible();
 
-    // « Me localiser » dévoile une petite zone (disque ≈ 1 km, ~230 cellules) sans déplacement.
+    // « Me localiser » dévoile une petite zone (petit cercle à l’arrêt, ~5-9 cellules) sans déplacement.
     await page.getByRole('button', { name: 'Stats' }).click();
-    await expect(page.getByTestId('stats-cells')).toHaveText(/^(19\d|2[0-5]\d)$/, {
+    await expect(page.getByTestId('stats-cells')).toHaveText(/^([3-9]|1[0-4])$/, {
       timeout: 15_000,
     });
   });

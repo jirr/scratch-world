@@ -7,6 +7,8 @@ const perfURL = 'http://localhost:4175/';
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
+  // WebGL logiciel + workers : au-delà, les machines modestes ralentissent assez pour provoquer des faux échecs.
+  workers: 3,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

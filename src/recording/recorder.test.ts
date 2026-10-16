@@ -35,10 +35,10 @@ let db: ScratchDb;
 let source: FakeSource;
 let recorder: Recorder;
 
-/** Marche vers le nord par pas de 30 m, un point par seconde (~30 m/s). */
-function walk(startMs: number, steps: number, accuracy = 10): PositionFix[] {
+/** Marche vers le nord par pas de `stepM` mètres (30 par défaut), un point par seconde. */
+function walk(startMs: number, steps: number, accuracy = 10, stepM = 30): PositionFix[] {
   return Array.from({ length: steps }, (_, i) => ({
-    lat: 48.85 + (i * 30) / 111_200,
+    lat: 48.85 + (i * stepM) / 111_200,
     lng: 2.35,
     accuracy,
     timestamp: startMs + i * 1000,
@@ -75,8 +75,8 @@ describe('Recorder', () => {
     const before = recorder.cellsAdded;
     for (const fix of walk(30_000, 20)) source.onFix(fix);
     await recorder.stop();
-    // Même trajet : au plus la cellule de raccord entre la fin et le retour au départ.
-    expect(recorder.cellsAdded).toBeLessThanOrEqual(before + 2);
+    // Même trajet : peu de cellules nouvelles (les zones se recouvrent).
+    expect(recorder.cellsAdded).toBeLessThanOrEqual(Math.ceil(before * 1.35));
     expect(source.stopped).toBe(true);
     expect(recorder.state).toBe('idle');
   });
@@ -93,23 +93,30 @@ describe('Recorder', () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 80)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBeGreaterThan(190);
-    expect(recorder.cellsAdded).toBeLessThan(260);
+    expect(recorder.cellsAdded).toBeGreaterThanOrEqual(3);
+    expect(recorder.cellsAdded).toBeLessThan(15);
   });
 
-  it('tolère une position à 900 m grâce à la zone de découverte', async () => {
+  it('à pied, le rayon reste petit et une position à 900 m est ignorée', async () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 900)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBeGreaterThan(190);
-    expect(recorder.cellsAdded).toBeLessThan(260);
+    expect(recorder.cellsAdded).toBe(0);
   });
 
-  it('ne dévoile une nouvelle zone qu’après 200 m de déplacement', async () => {
+  it('à pied, dévoile une petite zone autour de chaque tronçon parcouru', async () => {
     await recorder.start({ wakeLock: false });
-    for (const fix of walk(0, 5)) source.onFix(fix); // ~120 m
+    for (const fix of walk(0, 40, 10, 1.4)) source.onFix(fix); // 1,4 m/s
     await recorder.stop();
-    expect(recorder.cellsAdded).toBeLessThan(300);
+    expect(recorder.cellsAdded).toBeGreaterThan(3);
+    expect(recorder.cellsAdded).toBeLessThan(80);
+  });
+
+  it('en véhicule, la zone dévoilée est bien plus large', async () => {
+    await recorder.start({ wakeLock: false });
+    for (const fix of walk(0, 60, 10, 30)) source.onFix(fix); // 30 m/s
+    await recorder.stop();
+    expect(recorder.cellsAdded).toBeGreaterThan(300);
   });
 
   it('estime la vitesse pour le pictogramme de position', async () => {
