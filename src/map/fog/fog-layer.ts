@@ -43,7 +43,7 @@ export interface FogStats {
 }
 
 const THEMES = {
-  dark: { color: [12 / 255, 14 / 255, 20 / 255] as const, opacity: 0.94 },
+  dark: { color: [46 / 255, 54 / 255, 70 / 255] as const, opacity: 0.88 },
   light: { color: [40 / 255, 44 / 255, 52 / 255] as const, opacity: 0.86 },
 };
 

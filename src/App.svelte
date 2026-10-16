@@ -10,6 +10,7 @@
   import { Recorder } from './recording/recorder.svelte';
   import BottomBar from './ui/components/BottomBar.svelte';
   import ImportPanel from './ui/components/ImportPanel.svelte';
+  import InstallPrompt from './ui/components/InstallPrompt.svelte';
   import MapScreen from './ui/components/MapScreen.svelte';
   import SettingsPanel from './ui/components/SettingsPanel.svelte';
   import PermissionNotice from './ui/components/PermissionNotice.svelte';
@@ -67,4 +68,5 @@
   onClear={() => clearAll(db)}
   onClose={() => (menuOpen = false)}
 />
+<InstallPrompt />
 <UpdateToast />

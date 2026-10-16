@@ -1,5 +1,6 @@
 <script lang="ts">
   import { VERSION_LABEL } from '../../app/build-info';
+  import { installState, promptInstall } from '../../app/install-service.svelte';
   import { checkForUpdate, type UpdateCheckResult } from '../../app/update-service.svelte';
   import type { BackupSession } from '../../app/backup-session.svelte';
   import { isValidStyleUrl } from '../../map/styles';
@@ -186,6 +187,11 @@
     <h3 id="{titleId}-about">{S.settingsAbout}</h3>
     <p class="muted" data-testid="app-version">{VERSION_LABEL}</p>
     <p class="muted">{storageState.persisted ? S.storagePersisted : S.storageNotPersisted}</p>
+    {#if installState.canPrompt}
+      <p>
+        <button type="button" onclick={() => void promptInstall()}>{S.installMenu}</button>
+      </p>
+    {/if}
     <button type="button" onclick={onCheck} disabled={checking}>
       {checking ? S.updateChecking : S.updateCheck}
     </button>
