@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document>
+<Placemark><name>Trace horodatée</name><gx:Track>
+<when>2020-01-01T08:00:00.000Z</when>
+<when>2020-01-01T08:00:10.000Z</when>
+<when>2020-01-01T08:00:20.000Z</when>
+<when>2020-01-01T08:00:30.000Z</when>
+<when>2020-01-01T08:00:40.000Z</when>
+<when>2020-01-01T08:00:50.000Z</when>
+<when>2020-01-01T08:01:00.000Z</when>
+<when>2020-01-01T08:01:10.000Z</when>
+<when>2020-01-01T08:01:20.000Z</when>
+<when>2020-01-01T08:01:30.000Z</when>
+<when>2020-01-01T08:01:40.000Z</when>
+<when>2020-01-01T08:01:50.000Z</when>
+<when>2020-01-01T08:02:00.000Z</when>
+<when>2020-01-01T08:02:10.000Z</when>
+<when>2020-01-01T08:02:20.000Z</when>
+<when>2020-01-01T08:02:30.000Z</when>
+<when>2020-01-01T08:02:40.000Z</when>
+<when>2020-01-01T08:02:50.000Z</when>
+<when>2020-01-01T08:03:00.000Z</when>
+<when>2020-01-01T08:03:10.000Z</when>
+<when>2020-01-01T08:03:20.000Z</when>
+<when>2020-01-01T08:03:30.000Z</when>
+<when>2020-01-01T08:03:40.000Z</when>
+<when>2020-01-01T08:03:50.000Z</when>
+<when>2020-01-01T08:04:00.000Z</when>
+<when>2020-01-01T08:04:10.000Z</when>
+<when>2020-01-01T08:04:20.000Z</when>
+<when>2020-01-01T08:04:30.000Z</when>
+<when>2020-01-01T08:04:40.000Z</when>
+<when>2020-01-01T08:04:50.000Z</when>
+<when>2020-01-01T08:05:00.000Z</when>
+<when>2020-01-01T08:05:10.000Z</when>
+<when>2020-01-01T08:05:20.000Z</when>
+<when>2020-01-01T08:05:30.000Z</when>
+<when>2020-01-01T08:05:40.000Z</when>
+<when>2020-01-01T08:05:50.000Z</when>
+<when>2020-01-01T08:06:00.000Z</when>
+<when>2020-01-01T08:06:10.000Z</when>
+<when>2020-01-01T08:06:20.000Z</when>
+<when>2020-01-01T08:06:30.000Z</when>
+<gx:coord>2.1 47.20000 0</gx:coord>
+<gx:coord>2.1 47.20009 0</gx:coord>
+<gx:coord>2.1 47.20018 0</gx:coord>
+<gx:coord>2.1 47.20027 0</gx:coord>
+<gx:coord>2.1 47.20036 0</gx:coord>
+<gx:coord>2.1 47.20045 0</gx:coord>
+<gx:coord>2.1 47.20054 0</gx:coord>
+<gx:coord>2.1 47.20063 0</gx:coord>
+<gx:coord>2.1 47.20072 0</gx:coord>
+<gx:coord>2.1 47.20081 0</gx:coord>
+<gx:coord>2.1 47.20090 0</gx:coord>
+<gx:coord>2.1 47.20099 0</gx:coord>
+<gx:coord>2.1 47.20108 0</gx:coord>
+<gx:coord>2.1 47.20117 0</gx:coord>
+<gx:coord>2.1 47.20126 0</gx:coord>
+<gx:coord>2.1 47.20135 0</gx:coord>
+<gx:coord>2.1 47.20144 0</gx:coord>
+<gx:coord>2.1 47.20153 0</gx:coord>
+<gx:coord>2.1 47.20162 0</gx:coord>
+<gx:coord>2.1 47.20171 0</gx:coord>
+<gx:coord>2.1 47.20180 0</gx:coord>
+<gx:coord>2.1 47.20189 0</gx:coord>
+<gx:coord>2.1 47.20198 0</gx:coord>
+<gx:coord>2.1 47.20207 0</gx:coord>
+<gx:coord>2.1 47.20216 0</gx:coord>
+<gx:coord>2.1 47.20225 0</gx:coord>
+<gx:coord>2.1 47.20234 0</gx:coord>
+<gx:coord>2.1 47.20243 0</gx:coord>
+<gx:coord>2.1 47.20252 0</gx:coord>
+<gx:coord>2.1 47.20261 0</gx:coord>
+<gx:coord>2.1 47.20270 0</gx:coord>
+<gx:coord>2.1 47.20279 0</gx:coord>
+<gx:coord>2.1 47.20288 0</gx:coord>
+<gx:coord>2.1 47.20297 0</gx:coord>
+<gx:coord>2.1 47.20306 0</gx:coord>
+<gx:coord>2.1 47.20315 0</gx:coord>
+<gx:coord>2.1 47.20324 0</gx:coord>
+<gx:coord>2.1 47.20333 0</gx:coord>
+<gx:coord>2.1 47.20342 0</gx:coord>
+<gx:coord>2.1 47.20351 0</gx:coord>
+</gx:Track></Placemark>
+</Document>
+</kml>

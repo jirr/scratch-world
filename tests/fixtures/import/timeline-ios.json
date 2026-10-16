@@ -1,0 +1,65 @@
+[
+ {
+  "startTime": "2020-01-01T08:00:00.000Z",
+  "endTime": "2020-01-01T08:10:00.000Z",
+  "timelinePath": [
+   {
+    "point": "geo:47.20000,2.10000",
+    "durationMinutesOffsetFromStartTime": "0"
+   },
+   {
+    "point": "geo:47.20090,2.10000",
+    "durationMinutesOffsetFromStartTime": "1"
+   },
+   {
+    "point": "geo:47.20180,2.10000",
+    "durationMinutesOffsetFromStartTime": "2"
+   },
+   {
+    "point": "geo:47.20270,2.10000",
+    "durationMinutesOffsetFromStartTime": "3"
+   },
+   {
+    "point": "geo:47.20360,2.10000",
+    "durationMinutesOffsetFromStartTime": "4"
+   },
+   {
+    "point": "geo:47.20450,2.10000",
+    "durationMinutesOffsetFromStartTime": "5"
+   },
+   {
+    "point": "geo:47.20540,2.10000",
+    "durationMinutesOffsetFromStartTime": "6"
+   },
+   {
+    "point": "geo:47.20630,2.10000",
+    "durationMinutesOffsetFromStartTime": "7"
+   },
+   {
+    "point": "geo:47.20720,2.10000",
+    "durationMinutesOffsetFromStartTime": "8"
+   },
+   {
+    "point": "geo:47.20810,2.10000",
+    "durationMinutesOffsetFromStartTime": "9"
+   }
+  ]
+ },
+ {
+  "startTime": "2020-01-01T09:00:00.000Z",
+  "endTime": "2020-01-01T10:00:00.000Z",
+  "visit": {
+   "topCandidate": {
+    "placeLocation": "geo:47.30000,2.20000"
+   }
+  }
+ },
+ {
+  "startTime": "2020-01-01T10:00:00.000Z",
+  "endTime": "2020-01-01T10:05:00.000Z",
+  "activity": {
+   "start": "geo:47.40000,2.30000",
+   "end": "geo:47.40810,2.30000"
+  }
+ }
+]
