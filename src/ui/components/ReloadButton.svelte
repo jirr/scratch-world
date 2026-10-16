@@ -1,6 +1,7 @@
 <script lang="ts">
   import { busy } from '../../app/busy.svelte';
   import { S } from '../i18n/i18n.svelte';
+  import Icon from './Icon.svelte';
 
   let dialog: HTMLDialogElement | undefined = $state();
   const titleId = $props.id();
@@ -8,12 +9,12 @@
 
 <button
   type="button"
-  class="reload"
+  class="round reload"
   aria-label={S.reload}
   title={S.reload}
   onclick={() => dialog?.showModal()}
 >
-  ⟳
+  <Icon name="refresh" />
 </button>
 
 <dialog bind:this={dialog} aria-labelledby={titleId} data-testid="reload-dialog">
@@ -32,11 +33,6 @@
     position: fixed;
     right: 12px;
     top: calc(12px + env(safe-area-inset-top));
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    padding: 0;
-    font-size: 1.3rem;
     z-index: 5;
   }
 

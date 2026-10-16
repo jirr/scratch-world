@@ -1,5 +1,6 @@
 <script lang="ts">
   import { S } from '../i18n/i18n.svelte';
+  import Icon from './Icon.svelte';
 
   let {
     recording,
@@ -19,14 +20,13 @@
 </script>
 
 <nav class="bar" aria-label={S.navLabel} data-testid="bottom-bar">
-  <button type="button" onclick={onStats}><span>{S.navStats}</span></button>
+  <button type="button" onclick={onStats}><Icon name="stats" /><span>{S.navStats}</span></button>
   <button type="button" class="fab" class:paused={!recording} onclick={onRecord}>
-    <span
-      >{recording ? `⏸ ${S.recordPause}` : `▶ ${paused ? S.recordResume : S.recordStartNow}`}</span
-    >
+    <Icon name={recording ? 'pause' : 'play'} />
+    <span>{recording ? S.recordPause : paused ? S.recordResume : S.recordStartNow}</span>
   </button>
-  <button type="button" onclick={onImport}><span>{S.navImport}</span></button>
-  <button type="button" onclick={onMenu}><span>{S.navMenu}</span></button>
+  <button type="button" onclick={onImport}><Icon name="import" /><span>{S.navImport}</span></button>
+  <button type="button" onclick={onMenu}><Icon name="menu" /><span>{S.navMenu}</span></button>
 </nav>
 
 <style>
@@ -48,8 +48,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2px;
     flex: 1;
+    min-width: 0;
     min-height: 52px;
+    padding: 4px 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
   }
 
   .fab {
@@ -57,12 +62,17 @@
     background: var(--accent);
     color: var(--accent-fg);
     border-color: var(--accent);
-    font-weight: 600;
+    font-size: 0.9375rem;
+    font-weight: 700;
   }
 
   .fab.paused {
     background: var(--surface);
     color: var(--fg);
     border-color: var(--accent);
+  }
+
+  .fab.paused :global(.icon) {
+    color: var(--accent);
   }
 </style>

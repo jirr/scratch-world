@@ -122,12 +122,20 @@ export class FogLayer implements CustomLayerInterface {
     this.#map.triggerRepaint();
   }
 
-  /** Ajoute le calque s'il est absent (à rappeler après chaque changement de style). */
+  /**
+   * Ajoute le calque, ou le remonte au sommet de la pile s'il est déjà là. À rappeler après chaque
+   * changement de style : le diff de style de MapLibre ajoute les nouveaux calques en fin de pile,
+   * donc par-dessus le brouillard.
+   */
   attach(): void {
-    if (!this.#map.getLayer(this.id)) this.#map.addLayer(this);
+    if (this.#map.getLayer(this.id)) this.#map.moveLayer(this.id);
+    else this.#map.addLayer(this);
   }
 
   onAdd(map: MapLibreMap, gl: WebGL2RenderingContext): void {
+    // Un style reconstruit de zéro ne rappelle pas `onRemove` sur l'ancien : on libère ici. Les
+    // tableaux CPU des buckets survivent et seront ré-uploadés paresseusement.
+    if (this.#gl) this.#releaseGpu(this.#gl);
     this.#gl = gl;
     this.#programs = this.#createPrograms(gl);
     const quad = gl.createBuffer();
@@ -136,11 +144,6 @@ export class FogLayer implements CustomLayerInterface {
     this.#quad = quad;
     this.#emptyVao = gl.createVertexArray();
     this.#noise = this.#createNoise(gl);
-    // Les tableaux CPU survivent à un changement de style : on ré-uploade paresseusement.
-    for (const bucket of this.#cache.values()) {
-      bucket.vao = null;
-      bucket.vbo = null;
-    }
     map.on('move', this.#onMove);
     map.on('moveend', this.#onMoveEnd);
     void this.#ready.then(() => this.refresh());
@@ -149,21 +152,7 @@ export class FogLayer implements CustomLayerInterface {
   onRemove(map: MapLibreMap, gl: WebGL2RenderingContext): void {
     map.off('move', this.#onMove);
     map.off('moveend', this.#onMoveEnd);
-    for (const bucket of this.#cache.values()) this.#freeGpu(gl, bucket);
-    if (this.#mask) {
-      gl.deleteFramebuffer(this.#mask.fbo);
-      gl.deleteTexture(this.#mask.texture);
-      this.#mask = null;
-    }
-    if (this.#programs) {
-      gl.deleteProgram(this.#programs.mask);
-      gl.deleteProgram(this.#programs.compose);
-      this.#programs = null;
-    }
-    gl.deleteBuffer(this.#quad);
-    gl.deleteVertexArray(this.#emptyVao);
-    gl.deleteTexture(this.#noise);
-    this.#quad = this.#emptyVao = this.#noise = null;
+    this.#releaseGpu(gl);
     this.#gl = null;
   }
 
@@ -344,6 +333,24 @@ export class FogLayer implements CustomLayerInterface {
     if (bucket.vbo) gl.deleteBuffer(bucket.vbo);
     bucket.vao = null;
     bucket.vbo = null;
+  }
+
+  #releaseGpu(gl: WebGL2RenderingContext): void {
+    for (const bucket of this.#cache.values()) this.#freeGpu(gl, bucket);
+    if (this.#mask) {
+      gl.deleteFramebuffer(this.#mask.fbo);
+      gl.deleteTexture(this.#mask.texture);
+      this.#mask = null;
+    }
+    if (this.#programs) {
+      gl.deleteProgram(this.#programs.mask);
+      gl.deleteProgram(this.#programs.compose);
+      this.#programs = null;
+    }
+    gl.deleteBuffer(this.#quad);
+    gl.deleteVertexArray(this.#emptyVao);
+    gl.deleteTexture(this.#noise);
+    this.#quad = this.#emptyVao = this.#noise = null;
   }
 
   #ensureMask(gl: WebGL2RenderingContext): Mask {

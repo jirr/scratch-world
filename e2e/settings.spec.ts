@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { luminanceAt } from './support/pixels';
 import { stubOpenFreeMap } from './support/routes';
 
 test.beforeEach(async ({ context }) => {
@@ -100,4 +101,45 @@ test('le style de carte se choisit depuis la carte et s’applique tout de suite
   ).toHaveAttribute('aria-pressed', 'true');
   await page.keyboard.press('Escape');
   await expect(page.getByTestId('style-picker')).toBeHidden();
+});
+
+test('le brouillard reste au-dessus de la carte après un changement de style', async ({
+  context,
+  page,
+}) => {
+  // Le diff de style de MapLibre ajoute les nouveaux calques en fin de pile, donc par-dessus le
+  // brouillard (cas réel entre deux styles OpenFreeMap). Voile translucide : passe de rendu
+  // ordonnée comme les routes et libellés.
+  await context.route('https://tiles.openfreemap.org/styles/positron', (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        version: 8,
+        name: 'stub-positron',
+        sources: {},
+        layers: [
+          { id: 'background', type: 'background', paint: { 'background-color': '#dfe6f0' } },
+          {
+            id: 'veil',
+            type: 'background',
+            paint: { 'background-color': '#fff', 'background-opacity': 0.99 },
+          },
+        ],
+      }),
+    }),
+  );
+  await page.setViewportSize({ width: 800, height: 700 });
+  await page.goto('');
+  await expect(page.locator('.maplibregl-canvas')).toBeVisible();
+  const [x, y] = [100, 300];
+  await expect.poll(() => luminanceAt(page, x, y), { timeout: 15_000 }).toBeLessThan(100);
+
+  await page.getByRole('button', { name: 'Style de carte' }).click();
+  const picker = page.getByTestId('style-picker');
+  await picker.getByRole('button', { name: 'Positron' }).click();
+  // Aperçu sans brouillard : le nouveau fond est affiché.
+  await expect.poll(() => luminanceAt(page, x, y), { timeout: 15_000 }).toBeGreaterThan(250);
+
+  await picker.getByRole('button', { name: 'Fermer' }).click();
+  await expect.poll(() => luminanceAt(page, x, y), { timeout: 5_000 }).toBeLessThan(100);
 });

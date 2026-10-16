@@ -1,6 +1,7 @@
 <script lang="ts">
   import { applyUpdate, dismissUpdate, updateState } from '../../app/update-service.svelte';
   import { S } from '../i18n/i18n.svelte';
+  import Icon from './Icon.svelte';
 </script>
 
 {#if updateState.visible}
@@ -9,7 +10,9 @@
     <button type="button" class="primary" onclick={() => void applyUpdate()}>
       {S.updateAction}
     </button>
-    <button type="button" aria-label={S.updateDismiss} onclick={dismissUpdate}>✕</button>
+    <button type="button" class="dismiss" aria-label={S.updateDismiss} onclick={dismissUpdate}>
+      <Icon name="close" size={20} />
+    </button>
   </div>
 {/if}
 
@@ -29,5 +32,11 @@
     border: 1px solid var(--border);
     box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
     z-index: 1000;
+  }
+
+  .dismiss {
+    display: grid;
+    place-items: center;
+    padding: 0 10px;
   }
 </style>

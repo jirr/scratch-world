@@ -3,6 +3,7 @@
   import { changeSetting, settings } from '../state/settings.svelte';
   import { ui } from '../state/ui.svelte';
   import { S } from '../i18n/i18n.svelte';
+  import Icon from './Icon.svelte';
 
   let open = $state(false);
   const panelId = $props.id();
@@ -45,14 +46,14 @@
 
 <button
   type="button"
-  class="toggle"
+  class="round toggle"
   aria-label={S.mapStyleOpen}
   title={S.mapStyleOpen}
   aria-expanded={open}
   aria-controls={panelId}
   onclick={() => (open = !open)}
 >
-  ◫
+  <Icon name="layers" />
 </button>
 
 {#if open}
@@ -101,19 +102,19 @@
   .toggle {
     position: fixed;
     right: 12px;
-    top: calc(12px + 44px + 10px + env(safe-area-inset-top));
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    padding: 0;
-    font-size: 1.3rem;
+    top: calc(12px + 48px + 10px + env(safe-area-inset-top));
     z-index: 5;
+  }
+
+  .toggle[aria-expanded='true'] {
+    color: var(--accent);
+    border-color: var(--accent);
   }
 
   .panel {
     position: fixed;
     right: 12px;
-    top: calc(12px + 44px + 10px + 44px + 10px + env(safe-area-inset-top));
+    top: calc(12px + 48px + 10px + 48px + 10px + env(safe-area-inset-top));
     width: min(20rem, calc(100vw - 24px));
     max-height: calc(100dvh - 220px);
     overflow: auto;
