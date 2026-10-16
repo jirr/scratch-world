@@ -51,6 +51,23 @@ export const S = {
   installAction: 'Installer',
   installLater: 'Plus tard',
   installMenu: 'Installer l’application',
+  landingTagline: 'La carte du monde à gratter',
+  landingIntro:
+    'Un brouillard recouvre la carte. Là où tu vas, il se dissipe : gratte le monde pas à pas.',
+  landingPoints: [
+    'Enregistre tes trajets en direct ou importe tes traces (GPX, KML, Google Timeline).',
+    'Suis la surface dévoilée, la part du monde et les pays visités.',
+    'Tout reste sur ton appareil : aucun compte, aucun serveur, utilisable hors ligne.',
+  ],
+  landingPseudoLabel: 'Ton pseudo',
+  landingPseudoHint: 'Entre 2 et 24 caractères. Il reste sur cet appareil.',
+  landingPseudoInvalid: 'Choisis un pseudo de 2 à 24 caractères.',
+  landingStart: 'Commencer',
+  landingInstallTitle: 'Télécharger l’application',
+  landingInstallAction: 'Installer l’application',
+  landingInstallNone:
+    'Pour l’installer, ouvre le menu de ton navigateur et choisis « Installer l’application » ou « Ajouter à l’écran d’accueil ».',
+  settingsPseudo: 'Pseudo',
   statsTitle: 'Statistiques',
   statsArea: 'Surface dévoilée',
   statsCells: 'Cellules',

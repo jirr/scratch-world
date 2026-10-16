@@ -13,6 +13,13 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // Pseudo déjà choisi : les tests ne passent pas par la page d'accueil (sauf landing.spec.ts).
+    storageState: {
+      cookies: [],
+      origins: ['http://localhost:4173', 'http://localhost:4174', 'http://localhost:4175'].map(
+        (origin) => ({ origin, localStorage: [{ name: 'sw:pseudo', value: 'Testeur' }] }),
+      ),
+    },
     launchOptions: { args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'] },
   },
   webServer: perf
@@ -34,7 +41,8 @@ export default defineConfig({
   projects: [
     {
       name: 'app',
-      testMatch: /(app|recording|import|stats|settings|backup|a11y|install-prompt)\.spec\.ts/,
+      testMatch:
+        /(app|recording|import|stats|settings|backup|a11y|install-prompt|landing)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], serviceWorkers: 'block' },
     },
     {
