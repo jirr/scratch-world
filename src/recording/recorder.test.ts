@@ -83,7 +83,7 @@ describe('Recorder', () => {
 
   it('ignore une position trop imprécise', async () => {
     await recorder.start({ wakeLock: false });
-    source.onFix(walk(0, 1, 300)[0] as PositionFix);
+    source.onFix(walk(0, 1, 1500)[0] as PositionFix);
     await recorder.stop();
     expect(recorder.cellsAdded).toBe(0);
     expect(await db.chunks.count()).toBe(0);
@@ -93,15 +93,28 @@ describe('Recorder', () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 80)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBe(19);
+    expect(recorder.cellsAdded).toBe(217);
   });
 
-  it('utilise le seuil de précision des réglages', async () => {
-    await setSetting(db, 'accuracyThresholdM', 400);
+  it('tolère une position à 900 m grâce à la zone de découverte', async () => {
     await recorder.start({ wakeLock: false });
-    source.onFix(walk(0, 1, 300)[0] as PositionFix);
+    source.onFix(walk(0, 1, 900)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBe(19);
+    expect(recorder.cellsAdded).toBe(217);
+  });
+
+  it('ne dévoile une nouvelle zone qu’après 200 m de déplacement', async () => {
+    await recorder.start({ wakeLock: false });
+    for (const fix of walk(0, 5)) source.onFix(fix); // ~120 m
+    await recorder.stop();
+    expect(recorder.cellsAdded).toBeLessThan(217 + 40);
+  });
+
+  it('estime la vitesse pour le pictogramme de position', async () => {
+    await recorder.start({ wakeLock: false });
+    for (const fix of walk(0, 15)) source.onFix(fix); // 30 m/s
+    expect(recorder.speedMps).toBeGreaterThan(9);
+    await recorder.stop();
   });
 
   it('s’arrête quand la permission est refusée', async () => {

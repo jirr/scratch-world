@@ -1,11 +1,20 @@
 import { GPUInitializationError, Map as MapLibreMap, Marker, setWorkerUrl } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { MoveMode } from '../domain/speed-mode';
 import { installDebugOverlay } from './fog/debug-overlay';
 import { FogLayer } from './fog/fog-layer';
 import { resolveStyleUrl, type Appearance } from './styles';
 
 setWorkerUrl(workerUrl);
+
+/** Pictogramme de position selon la vitesse : à l'arrêt, à pied, en trottinette, en véhicule. */
+const PIN_ICONS: Record<MoveMode, { icon: string; label: string }> = {
+  idle: { icon: '🧍', label: 'Ta position (à l’arrêt)' },
+  walk: { icon: '🚶', label: 'Ta position (à pied)' },
+  scooter: { icon: '🛴', label: 'Ta position (en trottinette)' },
+  vehicle: { icon: '🚗', label: 'Ta position (en véhicule)' },
+};
 
 const CAMERA_KEY = 'sw:camera';
 const DEFAULT_CAMERA = { lng: 10, lat: 30, zoom: 1.5 };
@@ -44,6 +53,7 @@ export class MapView {
   readonly fog: FogLayer;
   #removeOverlay: (() => void) | null = null;
   #marker: Marker | null = null;
+  #pin: HTMLDivElement | null = null;
   #styleUrl: string;
 
   /** @throws {WebGL2RequiredError} si WebGL2 est indisponible. */
@@ -91,13 +101,23 @@ export class MapView {
   }
 
   /** Place le marqueur de position sans bouger la caméra. */
-  setPosition(lng: number, lat: number): void {
-    this.#marker ??= new Marker({ color: '#e5484d' });
+  setPosition(lng: number, lat: number, mode: MoveMode = 'idle'): void {
+    if (!this.#marker) {
+      this.#pin = document.createElement('div');
+      this.#pin.className = 'pin';
+      this.#pin.setAttribute('role', 'img');
+      this.#marker = new Marker({ element: this.#pin, anchor: 'center' });
+    }
+    if (this.#pin && this.#pin.dataset.mode !== mode) {
+      this.#pin.dataset.mode = mode;
+      this.#pin.textContent = PIN_ICONS[mode].icon;
+      this.#pin.setAttribute('aria-label', PIN_ICONS[mode].label);
+    }
     this.#marker.setLngLat([lng, lat]).addTo(this.map);
   }
 
-  showPosition(lng: number, lat: number): void {
-    this.setPosition(lng, lat);
+  showPosition(lng: number, lat: number, mode: MoveMode = 'idle'): void {
+    this.setPosition(lng, lat, mode);
     this.map.flyTo({ center: [lng, lat], zoom: Math.max(this.map.getZoom(), MIN_LOCATE_ZOOM) });
   }
 

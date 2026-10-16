@@ -32,9 +32,11 @@ export const SPEED_WINDOW_S = 600;
 /** Intervalle d'écriture des cellules du direct. */
 export const LIVE_FLUSH_MS = 2000;
 
-/** Le premier point d'un enregistrement est accepté jusqu'à cette imprécision : il dévoile la cellule de départ sans attendre un déplacement. */
-export const FIRST_FIX_MAX_ACCURACY_M = 250;
+/** Imprécision maximale des positions du direct : la zone de découverte (~1 km) absorbe l'erreur. */
+export const LIVE_MAX_ACCURACY_M = 1000;
+/** Une nouvelle zone de découverte est dévoilée quand on s'éloigne de la précédente d'au moins cette distance. */
+export const DISCOVERY_REFRESH_M = 200;
 /** Imprécision maximale pour que « Me localiser » gratte la zone de départ. */
-export const LOCATE_MAX_ACCURACY_M = 250;
-/** Rayon (en anneaux de cellules) de la petite zone dévoilée à la première position : 19 cellules ≈ 300 m. */
-export const START_ZONE_RINGS = 2;
+export const LOCATE_MAX_ACCURACY_M = 1000;
+/** Zone de découverte : cellule + 8 anneaux ≈ 1 km de rayon (217 cellules). */
+export const START_ZONE_RINGS = 8;

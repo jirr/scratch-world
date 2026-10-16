@@ -2,7 +2,8 @@ import { addCells } from '../data/cell-store';
 import type { ScratchDb } from '../data/db';
 import { getSetting } from '../data/settings-store';
 import {
-  FIRST_FIX_MAX_ACCURACY_M,
+  DISCOVERY_REFRESH_M,
+  LIVE_MAX_ACCURACY_M,
   LIVE_FLUSH_MS,
   MAX_GAP_M,
   MAX_GAP_NO_TIME_M,
@@ -12,6 +13,8 @@ import {
   SPEED_WINDOW_S,
 } from '../domain/config';
 import { PointFilter } from '../domain/point-filter';
+import { haversineM } from '../domain/geo';
+import { SpeedTracker } from '../domain/speed-mode';
 import { startZoneCells } from '../domain/start-zone';
 import { TrackCellizer, type TrackPoint } from '../domain/track-cellizer';
 import type { PositionFix, PositionSource, PositionStatus } from '../platform/position';
@@ -31,6 +34,8 @@ export class Recorder {
   cellsAdded = $state(0);
   elapsedMs = $state(0);
   lastFix = $state<PositionFix | null>(null);
+  /** Vitesse lissée (m/s), pour choisir le pictogramme de position. */
+  speedMps = $state(0);
 
   #deps: RecorderDeps;
   #filter: PointFilter | null = null;
@@ -47,7 +52,8 @@ export class Recorder {
   #startedAt = 0;
   #seq = 0;
   /** Vrai une fois la zone de départ dévoilée. */
-  #started = false;
+  #lastZone: { lat: number; lng: number } | null = null;
+  #speed = new SpeedTracker();
   #flushTimer: ReturnType<typeof setInterval> | null = null;
   #tickTimer: ReturnType<typeof setInterval> | null = null;
   #flushing: Promise<void> = Promise.resolve();
@@ -64,8 +70,7 @@ export class Recorder {
     if (this.state === 'recording') return;
     const { db, source, wakeLock } = this.#deps;
     this.#filter = new PointFilter({
-      maxAccuracyM: await getSetting(db, 'accuracyThresholdM'),
-      firstFixMaxAccuracyM: FIRST_FIX_MAX_ACCURACY_M,
+      maxAccuracyM: LIVE_MAX_ACCURACY_M,
       maxSpeedMps: MAX_SPEED_MPS,
       minDistanceM: MIN_DISTANCE_M,
       speedWindowS: SPEED_WINDOW_S,
@@ -75,7 +80,9 @@ export class Recorder {
     this.#pending.clear();
     this.#rawPoints = [];
     this.#seq = 0;
-    this.#started = false;
+    this.#lastZone = null;
+    this.#speed.reset();
+    this.speedMps = 0;
     this.cellsAdded = 0;
     this.elapsedMs = 0;
     this.lastFix = null;
@@ -112,10 +119,16 @@ export class Recorder {
   #onFix(fix: PositionFix): void {
     if (this.state !== 'recording' || !this.#filter) return;
     this.lastFix = fix;
+    this.speedMps = this.#speed.push(fix);
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };
     if (this.#filter.accept(point) !== 'accepted') return;
-    if (!this.#started) {
-      this.#started = true;
+    // Zone de découverte (~1 km) : dévoilée à la première position, puis à chaque éloignement notable.
+    const lastZone = this.#lastZone;
+    if (
+      !lastZone ||
+      haversineM(lastZone.lat, lastZone.lng, point.lat, point.lng) >= DISCOVERY_REFRESH_M
+    ) {
+      this.#lastZone = { lat: point.lat, lng: point.lng };
       for (const cell of startZoneCells(point.lat, point.lng)) this.#pending.add(cell);
     }
     for (const cell of this.#cellizer.push(point)) this.#pending.add(cell);
