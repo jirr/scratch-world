@@ -25,13 +25,22 @@ test('le thème et les réglages sont appliqués et persistés', async ({ page }
   await expect(page.getByLabel('Style de carte')).toHaveValue('custom');
 });
 
-test('le bouton « Recharger la page » recharge l’application', async ({ page }) => {
+test('le bouton de la carte recharge l’application après confirmation', async ({ page }) => {
   await page.goto('');
   await page.evaluate(() => ((window as unknown as { __marker: boolean }).__marker = true));
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Recharger la page' }).click();
+  await expect(page.getByTestId('reload-dialog')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Annuler' }).click();
+  await expect(page.getByTestId('reload-dialog')).toBeHidden();
+  expect(await page.evaluate(() => (window as unknown as { __marker?: boolean }).__marker)).toBe(
+    true,
+  );
+
+  await page.getByRole('button', { name: 'Recharger la page' }).click();
   await Promise.all([
     page.waitForEvent('load'),
-    page.getByRole('button', { name: 'Recharger la page' }).click(),
+    page.getByRole('button', { name: 'Recharger', exact: true }).click(),
   ]);
   expect(
     await page.evaluate(() => (window as unknown as { __marker?: boolean }).__marker),
