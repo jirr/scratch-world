@@ -55,6 +55,10 @@ TypeScript strict, Svelte 5 (sans SvelteKit), Vite. Les couches sont séparées 
 
 Calque custom MapLibre (WebGL2) : un masque hors-écran à demi-résolution accumule un noyau radial par cellule visitée (instancié, par buckets H3 construits dans `fog.worker`), puis une passe plein écran compose le brouillard avec un grain. Ajoute `?debug=1` à l’URL pour afficher FPS, résolution d’affichage, buckets/instances dessinés et nombre de cellules. `pnpm gen:cells [n]` produit une sauvegarde synthétique dans `perf/`. Un exemple de mesure est dans [docs/m03-perf-report.json](docs/m03-perf-report.json).
 
+## Import
+
+Formats : GPX, KML (dont `gx:Track`), Google Timeline Android (`semanticSegments`) et iPhone (tableau en racine), `Records.json`. Les JSON sont lus **en flux** (jamais chargés entièrement), dans `import.worker`. L’import est idempotent : l’empreinte SHA-256 (premier Mio ‖ dernier Mio ‖ taille) détecte un fichier déjà importé. Non gérés : l’ancien « Semantic Location History » (`timelineObjects`) et les archives ZIP Takeout (dézipper d’abord). `pnpm gen:fixtures` régénère les fichiers fictifs de `tests/fixtures/import` ; `--large` produit un `perf/records-large.json` de 200 Mo.
+
 ## Mise à jour de la PWA
 
 Le service worker est enregistré en mode `prompt` : une nouvelle version ne remplace jamais l'ancienne sans accord. L'application vérifie la présence d'une mise à jour au retour au premier plan et toutes les heures, puis affiche « Nouvelle version disponible ». Le toast est **différé tant qu'une opération longue est en cours** (import, enregistrement, restauration). La version affichée (`vX.Y.Z (sha)`) permet de vérifier ce qui tourne.
