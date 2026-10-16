@@ -11,6 +11,12 @@ test('la carte est affichée', async ({ page }) => {
   await expect(page.getByTestId('bottom-bar')).toBeVisible();
 });
 
+test('le calque de brouillard s’initialise (overlay debug)', async ({ page }) => {
+  await page.goto('?debug=1');
+  await expect(page.getByTestId('fog-debug')).toContainText(/res \d+/);
+  await expect(page.getByTestId('fog-debug')).toContainText('cells 0');
+});
+
 test.describe('géolocalisation refusée', () => {
   test.use({ permissions: [] });
 
