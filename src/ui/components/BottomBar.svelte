@@ -5,19 +5,19 @@
     recording,
     onRecord,
     onImport,
+    onStats,
     onMenu,
   }: {
     recording: boolean;
     onRecord: () => void;
     onImport: () => void;
+    onStats: () => void;
     onMenu: () => void;
   } = $props();
 </script>
 
 <nav class="bar" aria-label="Navigation principale" data-testid="bottom-bar">
-  <button type="button" aria-disabled="true" title={S.soon}>
-    <span>{S.navStats}</span><small>{S.soon}</small>
-  </button>
+  <button type="button" onclick={onStats}><span>{S.navStats}</span></button>
   <button type="button" class="fab" class:active={recording} onclick={onRecord}>
     <span>{recording ? `■ ${S.recordStop}` : `● ${S.navRecord}`}</span>
   </button>
@@ -46,16 +46,6 @@
     justify-content: center;
     flex: 1;
     min-height: 52px;
-  }
-
-  button[aria-disabled='true'] {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-
-  small {
-    font-size: 0.7rem;
-    color: var(--muted);
   }
 
   .fab {
