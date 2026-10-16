@@ -17,6 +17,7 @@ export default defineConfig({
     command: 'pnpm preview',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
+    env: { BASE_PATH: '/scratch-world/' },
   },
   projects: [
     {
