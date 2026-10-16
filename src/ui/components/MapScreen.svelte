@@ -2,14 +2,15 @@
   import { onMount } from 'svelte';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
+  import type { Recorder } from '../../recording/recorder.svelte';
   import { S } from '../strings';
-  import PermissionNotice from './PermissionNotice.svelte';
 
+  let { recorder, onPermissionDenied }: { recorder: Recorder; onPermissionDenied: () => void } =
+    $props();
   let container: HTMLDivElement | undefined = $state();
   let webglMissing = $state(false);
   let locating = $state(false);
   let locateError = $state<string | null>(null);
-  let permissionOpen = $state(false);
   let view: MapView | null = null;
 
   const positionSource = createPositionSource();
@@ -32,6 +33,12 @@
     return () => view?.destroy();
   });
 
+  // Pendant l'enregistrement, le marqueur suit la position sans déplacer la caméra.
+  $effect(() => {
+    const fix = recorder.lastFix;
+    if (fix) view?.setPosition(fix.lng, fix.lat);
+  });
+
   async function locate() {
     locateError = null;
     locating = true;
@@ -39,7 +46,7 @@
       const fix = await positionSource.getCurrent();
       view?.showPosition(fix.lng, fix.lat);
     } catch (error) {
-      if (error instanceof PositionError && error.status === 'denied') permissionOpen = true;
+      if (error instanceof PositionError && error.status === 'denied') onPermissionDenied();
       else locateError = S.locateUnavailable;
     } finally {
       locating = false;
@@ -69,8 +76,6 @@
   </p>
 {/if}
 
-<PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
-
 <style>
   .map {
     position: fixed;
@@ -91,7 +96,7 @@
   .status {
     position: fixed;
     left: 12px;
-    top: calc(12px + env(safe-area-inset-top));
+    top: calc(56px + env(safe-area-inset-top));
     margin: 0;
     z-index: 5;
     color: var(--fg);

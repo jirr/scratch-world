@@ -1,15 +1,19 @@
 <script lang="ts">
   import { S } from '../strings';
 
-  let { onMenu }: { onMenu: () => void } = $props();
+  let {
+    recording,
+    onRecord,
+    onMenu,
+  }: { recording: boolean; onRecord: () => void; onMenu: () => void } = $props();
 </script>
 
 <nav class="bar" aria-label="Navigation principale" data-testid="bottom-bar">
   <button type="button" aria-disabled="true" title={S.soon}>
     <span>{S.navStats}</span><small>{S.soon}</small>
   </button>
-  <button type="button" class="fab" aria-disabled="true" title={S.soon}>
-    <span>● {S.navRecord}</span><small>{S.soon}</small>
+  <button type="button" class="fab" class:active={recording} onclick={onRecord}>
+    <span>{recording ? `■ ${S.recordStop}` : `● ${S.navRecord}`}</span>
   </button>
   <button type="button" aria-disabled="true" title={S.soon}>
     <span>{S.navImport}</span><small>{S.soon}</small>
@@ -58,7 +62,9 @@
     font-weight: 600;
   }
 
-  .fab small {
-    color: inherit;
+  .fab.active {
+    background: #e5484d;
+    border-color: #e5484d;
+    color: #fff;
   }
 </style>
