@@ -40,3 +40,8 @@ export const DISCOVERY_REFRESH_M = 200;
 export const LOCATE_MAX_ACCURACY_M = 1000;
 /** Rayon (m) de la zone de découverte, dévoilée en disque autour de la position. */
 export const DISCOVERY_RADIUS_M = 1000;
+
+/** « Me localiser » s'arrête dès qu'une position est au moins aussi précise... */
+export const GOOD_ACCURACY_M = 100;
+/** ...ou après ce délai (ms), avec la meilleure position reçue. */
+export const BEST_FIX_TIMEOUT_MS = 12_000;

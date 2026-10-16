@@ -63,7 +63,7 @@ test.describe('localisation imprécise', () => {
     await context.setGeolocation({ latitude: 48.8585, longitude: 2.2945, accuracy: 3000 });
     await expect(
       page.getByRole('status').filter({ hasText: 'Position trop imprécise (±3000 m)' }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 20_000 });
     await expect(page.getByTestId('approximate-notice')).toBeHidden();
 
     await page.getByRole('button', { name: /comment activer la localisation précise/ }).click();
