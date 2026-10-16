@@ -1,6 +1,7 @@
 <script lang="ts">
   import { StatsClient } from './app/stats-client.svelte';
   import { BackupSession } from './app/backup-session.svelte';
+  import { profile } from './app/profile.svelte';
   import { ImportSession } from './app/import-session.svelte';
   import { clearAll } from './data/cell-store';
   import { db } from './data/db';
@@ -11,6 +12,7 @@
   import BottomBar from './ui/components/BottomBar.svelte';
   import ImportPanel from './ui/components/ImportPanel.svelte';
   import InstallPrompt from './ui/components/InstallPrompt.svelte';
+  import Landing from './ui/components/Landing.svelte';
   import MapScreen from './ui/components/MapScreen.svelte';
   import SettingsPanel from './ui/components/SettingsPanel.svelte';
   import PermissionNotice from './ui/components/PermissionNotice.svelte';
@@ -49,24 +51,28 @@
   void initSettings();
 </script>
 
-<MapScreen {recorder} onPermissionDenied={() => (permissionOpen = true)} />
-<RecordingIndicator {recorder} />
-<BottomBar
-  recording={recorder.state === 'recording'}
-  {onRecord}
-  onImport={() => (importOpen = true)}
-  onStats={() => (statsOpen = true)}
-  onMenu={() => (menuOpen = true)}
-/>
-<StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
-<ImportPanel session={importSession} open={importOpen} onClose={() => (importOpen = false)} />
-<RecordingSheet {recorder} open={sheetOpen} onClose={() => (sheetOpen = false)} />
-<PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
-<SettingsPanel
-  open={menuOpen}
-  backup={backupSession}
-  onClear={() => clearAll(db)}
-  onClose={() => (menuOpen = false)}
-/>
-<InstallPrompt />
-<UpdateToast />
+{#if !profile.pseudo}
+  <Landing />
+{:else}
+  <MapScreen {recorder} onPermissionDenied={() => (permissionOpen = true)} />
+  <RecordingIndicator {recorder} />
+  <BottomBar
+    recording={recorder.state === 'recording'}
+    {onRecord}
+    onImport={() => (importOpen = true)}
+    onStats={() => (statsOpen = true)}
+    onMenu={() => (menuOpen = true)}
+  />
+  <StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
+  <ImportPanel session={importSession} open={importOpen} onClose={() => (importOpen = false)} />
+  <RecordingSheet {recorder} open={sheetOpen} onClose={() => (sheetOpen = false)} />
+  <PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
+  <SettingsPanel
+    open={menuOpen}
+    backup={backupSession}
+    onClear={() => clearAll(db)}
+    onClose={() => (menuOpen = false)}
+  />
+  <InstallPrompt />
+  <UpdateToast />
+{/if}

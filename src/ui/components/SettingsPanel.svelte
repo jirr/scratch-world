@@ -1,6 +1,7 @@
 <script lang="ts">
   import { VERSION_LABEL } from '../../app/build-info';
   import { installState, promptInstall } from '../../app/install-service.svelte';
+  import { profile, setPseudo } from '../../app/profile.svelte';
   import { checkForUpdate, type UpdateCheckResult } from '../../app/update-service.svelte';
   import type { BackupSession } from '../../app/backup-session.svelte';
   import { isValidStyleUrl } from '../../map/styles';
@@ -70,6 +71,22 @@
   data-testid="menu-panel"
 >
   <h2 id={titleId}>{S.menuTitle}</h2>
+
+  <section aria-labelledby="{titleId}-me">
+    <h3 id="{titleId}-me">{S.settingsPseudo}</h3>
+    <label class="field">
+      <span>{S.landingPseudoLabel}</span>
+      <input
+        type="text"
+        data-testid="pseudo-setting"
+        value={profile.pseudo}
+        maxlength="24"
+        onchange={(e) => {
+          if (!setPseudo(e.currentTarget.value)) e.currentTarget.value = profile.pseudo;
+        }}
+      />
+    </label>
+  </section>
 
   <section aria-labelledby="{titleId}-rec">
     <h3 id="{titleId}-rec">{S.settingsRecording}</h3>
@@ -251,6 +268,7 @@
   }
 
   select,
+  input[type='text'],
   input[type='url'] {
     font: inherit;
     padding: 8px;
