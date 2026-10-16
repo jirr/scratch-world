@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   import { addCells } from '../../data/cell-store';
   import { db } from '../../data/db';
-  import { APPROXIMATE_ACCURACY_M, LOCATE_MAX_ACCURACY_M } from '../../domain/config';
+  import { LOCATE_MAX_ACCURACY_M } from '../../domain/config';
   import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
   import { createPositionSource, PositionError } from '../../platform/position';
@@ -25,6 +25,17 @@
   let webglMissing = $state(false);
   let locating = $state(false);
   let locateError = $state<string | null>(null);
+  /** Précision (m) de la dernière position trop imprécise pour gratter. */
+  let locateAccuracy = $state<number | null>(null);
+  // Enregistrement en cours sans aucune cellule : la précision reçue est probablement en cause.
+  const impreciseM = $derived(
+    recorder.state === 'recording' &&
+      recorder.cellsAdded === 0 &&
+      recorder.lastFix &&
+      recorder.lastFix.accuracy > LOCATE_MAX_ACCURACY_M
+      ? Math.round(recorder.lastFix.accuracy)
+      : locateAccuracy,
+  );
   let view = $state.raw<MapView | null>(null);
 
   const positionSource = createPositionSource();
@@ -74,6 +85,7 @@
 
   async function locate() {
     locateError = null;
+    locateAccuracy = null;
     locating = true;
     try {
       const fix = await positionSource.getCurrent();
@@ -81,10 +93,8 @@
       // Dévoile une petite zone autour de la position, sans attendre un déplacement.
       if (fix.accuracy <= LOCATE_MAX_ACCURACY_M) {
         await addCells(db, startZoneCells(fix.lat, fix.lng));
-      } else if (fix.accuracy > APPROXIMATE_ACCURACY_M) {
-        onApproximate();
       } else {
-        locateError = S.locateTooImprecise(Math.round(fix.accuracy));
+        locateAccuracy = Math.round(fix.accuracy);
       }
     } catch (error) {
       if (error instanceof PositionError && error.status === 'denied') onPermissionDenied();
@@ -113,7 +123,10 @@
     ◎
   </button>
   <p class="status" role="status">
-    {#if locating}{S.locating}{:else if locateError}{locateError}{/if}
+    {#if locating}{S.locating}{:else if impreciseM !== null}
+      {S.locateTooImprecise(impreciseM)}
+      <button type="button" class="link" onclick={onApproximate}>{S.locateHowTo}</button>
+    {:else if locateError}{locateError}{/if}
   </p>
 {/if}
 
@@ -141,6 +154,24 @@
     margin: 0;
     z-index: 5;
     color: var(--fg);
+  }
+
+  .status {
+    max-width: min(26rem, calc(100vw - 24px));
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .link {
+    display: inline;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--accent);
+    text-decoration: underline;
   }
 
   .status:empty {

@@ -35,20 +35,13 @@
   let sheetOpen = $state(false);
   let permissionOpen = $state(false);
   let approxOpen = $state(false);
-  let approxShown = false;
   let retryToken = $state(0);
 
   $effect(() => {
     document.documentElement.dataset.theme = settings.theme;
   });
 
-  $effect(() => {
-    // Une seule fois par session : pas de fenêtre en boucle.
-    if (recorder.approximate && !approxShown) {
-      approxShown = true;
-      approxOpen = true;
-    }
-  });
+  $effect(() => {});
 
   $effect(() => {
     if (recorder.status === 'denied') permissionOpen = true;
