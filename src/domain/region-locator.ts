@@ -3,24 +3,23 @@ import Flatbush from 'flatbush';
 import { cellToBoundary, cellToLatLng } from 'h3-js';
 import type { MultiPolygon, Polygon, Position } from 'geojson';
 
-export interface RegionCountry {
+export interface ZoneFeature {
   code: string;
   geometry: Polygon | MultiPolygon;
 }
 
 /**
- * Rattache une cellule (résolution 7) à un pays : centre dans un polygone ; sinon, premier des 6
- * sommets qui tombe dans un pays (cellules côtières) ; sinon `''` (mer).
+ * Rattache une cellule (résolution 7) à une zone (pays, région, département…) : centre dans un
+ * polygone ; sinon, premier des 6 sommets qui tombe dans une zone (cellules côtières) ; sinon
+ * `''` (aucune zone, ex. mer).
  */
-export function createRegionLocator(countries: RegionCountry[]): (cell: string) => string {
+export function createZoneLocator(zones: ZoneFeature[]): (cell: string) => string {
   const polygons: { code: string; polygon: Polygon }[] = [];
-  for (const country of countries) {
+  for (const zone of zones) {
     const rings =
-      country.geometry.type === 'Polygon'
-        ? [country.geometry.coordinates]
-        : country.geometry.coordinates;
+      zone.geometry.type === 'Polygon' ? [zone.geometry.coordinates] : zone.geometry.coordinates;
     for (const coordinates of rings)
-      polygons.push({ code: country.code, polygon: { type: 'Polygon', coordinates } });
+      polygons.push({ code: zone.code, polygon: { type: 'Polygon', coordinates } });
   }
 
   const index = new Flatbush(Math.max(1, polygons.length));

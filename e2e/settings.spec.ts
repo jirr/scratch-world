@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { openMenu, openMenuSection } from './support/menu';
 import { luminanceAt } from './support/pixels';
 import { stubOpenFreeMap } from './support/routes';
 
@@ -8,16 +9,19 @@ test.beforeEach(async ({ context }) => {
 
 test('le thème et les réglages sont appliqués et persistés', async ({ page }) => {
   await page.goto('');
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
 
+  await openMenuSection(page, 'Apparence');
   await page.getByLabel('Thème').selectOption('dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
+  await openMenuSection(page, 'Enregistrement');
   await page.getByLabel(/Conserver les traces brutes/).check();
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'Enregistrement');
   await expect(page.getByLabel(/Conserver les traces brutes/)).toBeChecked();
 });
 
@@ -29,7 +33,8 @@ test.describe('système en anglais', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.getByRole('button', { name: 'Locate me' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await openMenu(page);
+    await openMenuSection(page, 'Appearance');
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
     await page.getByLabel('Language').selectOption('fr');
     await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
@@ -39,7 +44,8 @@ test.describe('système en anglais', () => {
     // Mémorisé après rechargement, puis retour à la langue du système.
     await page.reload();
     await expect(page.getByRole('button', { name: 'Me localiser' })).toBeVisible();
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await openMenu(page);
+    await openMenuSection(page, 'Apparence');
     await page.getByLabel('Langue').selectOption('system');
     await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');

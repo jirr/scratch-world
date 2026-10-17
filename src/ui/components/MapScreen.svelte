@@ -41,6 +41,7 @@
       : locateAccuracy,
   );
   let view = $state.raw<MapView | null>(null);
+  let drawing = $state(false);
 
   const positionSource = createPositionSource();
 
@@ -56,6 +57,13 @@
 
   $effect(() => {
     view?.fog.setHidden(ui.stylePreview);
+  });
+
+  // Mode dessin : l'arrêt (nouveau clic ou démontage) écrit les dernières cellules.
+  $effect(() => {
+    if (!view || !drawing) return;
+    const stop = view.startDrawing((cells) => addCells(db, cells));
+    return () => void stop();
   });
 
   $effect(() => {
@@ -134,6 +142,18 @@
   >
     <Icon name="locate" size={26} />
   </button>
+  <button
+    type="button"
+    class="round draw"
+    class:active={drawing}
+    onclick={() => (drawing = !drawing)}
+    aria-pressed={drawing}
+    aria-label={S.draw}
+    title={S.draw}
+    data-testid="draw-toggle"
+  >
+    <Icon name="pencil" size={24} />
+  </button>
   <p class="status" role="status">
     {#if locating}{S.locating}{:else if impreciseM !== null}
       {S.locateTooImprecise(impreciseM)}
@@ -157,6 +177,19 @@
 
   .locate:disabled {
     color: var(--accent);
+  }
+
+  .draw {
+    position: fixed;
+    right: 12px;
+    bottom: calc(96px + env(safe-area-inset-bottom) + 28px + 48px + 10px);
+    z-index: 5;
+  }
+
+  .draw.active {
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-color: var(--accent);
   }
 
   .status {

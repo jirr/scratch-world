@@ -4,19 +4,24 @@
   import { profile, setPseudo } from '../../app/profile.svelte';
   import { checkForUpdate, type UpdateCheckResult } from '../../app/update-service.svelte';
   import type { BackupSession } from '../../app/backup-session.svelte';
+  import type { ImportSession } from '../../app/import-session.svelte';
   import { storageState } from '../../platform/storage-persist.svelte';
   import { changeSetting, settings } from '../state/settings.svelte';
   import { S } from '../i18n/i18n.svelte';
   import ClearDialog from './ClearDialog.svelte';
+  import ImportSection from './ImportSection.svelte';
+  import Section from './Section.svelte';
 
   let {
     open,
     backup,
+    importSession,
     onClear,
     onClose,
   }: {
     open: boolean;
     backup: BackupSession;
+    importSession: ImportSession;
     onClear: () => Promise<void>;
     onClose: () => void;
   } = $props();
@@ -32,6 +37,7 @@
     if (!dialog) return;
     if (open && !dialog.open) {
       cleared = false;
+      importSession.reset();
       dialog.showModal();
       // Pas d'autofocus sur le pseudo (clavier mobile) : focus sur le panneau lui-même.
       dialog.focus();
@@ -57,14 +63,14 @@
   class="sheet"
   bind:this={dialog}
   onclose={onClose}
+  oncancel={(e) => importSession.state === 'running' && e.preventDefault()}
   aria-labelledby={titleId}
   tabindex="-1"
   data-testid="menu-panel"
 >
   <h2 id={titleId}>{S.menuTitle}</h2>
 
-  <section aria-labelledby="{titleId}-me">
-    <h3 id="{titleId}-me">{S.settingsPseudo}</h3>
+  <Section title={S.settingsPseudo}>
     <label class="field">
       <span>{S.landingPseudoLabel}</span>
       <input
@@ -77,10 +83,9 @@
         }}
       />
     </label>
-  </section>
+  </Section>
 
-  <section aria-labelledby="{titleId}-rec">
-    <h3 id="{titleId}-rec">{S.settingsRecording}</h3>
+  <Section title={S.settingsRecording}>
     <label class="field">
       <span>{S.settingsAccuracy(settings.accuracyThresholdM)}</span>
       <input
@@ -109,10 +114,9 @@
       />
       {S.settingsWakeLock}
     </label>
-  </section>
+  </Section>
 
-  <section aria-labelledby="{titleId}-look">
-    <h3 id="{titleId}-look">{S.settingsAppearance}</h3>
+  <Section title={S.settingsAppearance}>
     <label class="field">
       <span>{S.settingsTheme}</span>
       <select
@@ -137,10 +141,11 @@
         {/each}
       </select>
     </label>
-  </section>
+  </Section>
 
-  <section aria-labelledby="{titleId}-data">
-    <h3 id="{titleId}-data">{S.settingsData}</h3>
+  <ImportSection session={importSession} />
+
+  <Section title={S.settingsData}>
     <label class="check">
       <input type="checkbox" bind:checked={includeTracks} />
       {S.backupIncludeTracks}
@@ -179,10 +184,9 @@
     >
       {#if backup.message}{S.backupStatus(backup.message)}{:else if cleared}{S.clearDone}{/if}
     </p>
-  </section>
+  </Section>
 
-  <section aria-labelledby="{titleId}-about">
-    <h3 id="{titleId}-about">{S.settingsAbout}</h3>
+  <Section title={S.settingsAbout}>
     <p class="muted" data-testid="app-version">{VERSION_LABEL}</p>
     <p class="muted">{storageState.persisted ? S.storagePersisted : S.storageNotPersisted}</p>
     {#if installState.canPrompt}
@@ -194,7 +198,7 @@
       {checking ? S.updateChecking : S.updateCheck}
     </button>
     {#if updateResult}<p data-testid="update-check-result">{S.updateResults[updateResult]}</p>{/if}
-  </section>
+  </Section>
 
   <p class="row end">
     <button type="button" class="primary" onclick={() => dialog?.close()}>{S.close}</button>
@@ -212,16 +216,6 @@
     background: var(--surface);
     color: var(--fg);
     border: 1px solid var(--border);
-  }
-
-  h3 {
-    margin: 16px 0 6px;
-    font-size: 1rem;
-  }
-
-  section {
-    border-top: 1px solid var(--border);
-    padding-bottom: 4px;
   }
 
   .field {

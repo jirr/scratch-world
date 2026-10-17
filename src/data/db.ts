@@ -47,6 +47,10 @@ export interface RegionCacheRow {
   cell: string;
   /** Code pays, ou `''` pour la mer. */
   country: string;
+  /** Code de région française métropolitaine, `''` hors de France métropolitaine. */
+  region: string;
+  /** Code de département français métropolitain, `''` hors de France métropolitaine. */
+  department: string;
 }
 
 export class ScratchDb extends Dexie {

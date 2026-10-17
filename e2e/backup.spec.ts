@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { importFile, openMenu, openMenuSection } from './support/menu';
 import { stubOpenFreeMap } from './support/routes';
 
 test.beforeEach(async ({ context }) => {
@@ -10,8 +11,7 @@ test('sauvegarder, tout effacer, restaurer : même nombre de cellules', async ({
 }, testInfo) => {
   await page.goto('');
 
-  await page.getByRole('button', { name: 'Importer' }).click();
-  await page.getByTestId('import-input').setInputFiles('tests/fixtures/import/walk.gpx');
+  await importFile(page, 'tests/fixtures/import/walk.gpx');
   await expect(page.getByTestId('import-results')).toContainText(/cellules ajoutées/);
   await page.getByRole('button', { name: 'Fermer' }).click();
 
@@ -27,7 +27,8 @@ test('sauvegarder, tout effacer, restaurer : même nombre de cellules', async ({
   expect(Number(before.replace(/\s/g, ''))).toBeGreaterThan(10);
 
   // Sauvegarde.
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'Données');
   const [download] = await Promise.all([
     page.waitForEvent('download'),
     page.getByRole('button', { name: 'Sauvegarder' }).click(),
@@ -50,7 +51,8 @@ test('sauvegarder, tout effacer, restaurer : même nombre de cellules', async ({
   await page.getByRole('button', { name: 'Fermer' }).click();
 
   // Restauration.
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'Données');
   await page.getByTestId('restore-input').setInputFiles(file);
   await expect(page.getByTestId('backup-status')).toContainText('Restauration terminée');
   await page.getByRole('button', { name: 'Fermer' }).click();
@@ -60,7 +62,8 @@ test('sauvegarder, tout effacer, restaurer : même nombre de cellules', async ({
 
 test('refuse un fichier qui n’est pas une sauvegarde', async ({ page }) => {
   await page.goto('');
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'Données');
   await page.getByTestId('restore-input').setInputFiles('tests/fixtures/import/unknown.json');
   await expect(page.getByTestId('backup-status')).toContainText('pas une sauvegarde');
 });

@@ -2,6 +2,7 @@ import { GPUInitializationError, Map as MapLibreMap, Marker, setWorkerUrl } from
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { MoveMode } from '../domain/speed-mode';
+import { DrawController, type DrawFlush } from './draw-controller';
 import { installDebugOverlay } from './fog/debug-overlay';
 import { FogLayer } from './fog/fog-layer';
 import { resolveStyleUrl, type Appearance } from './styles';
@@ -56,6 +57,7 @@ export class MapView {
   #pin: HTMLDivElement | null = null;
   #styleUrl: string;
   #pinLabels: Record<MoveMode, string> | null = null;
+  #stopDrawing: (() => Promise<void>) | null = null;
 
   /** @throws {WebGL2RequiredError} si WebGL2 est indisponible. */
   constructor(container: HTMLElement, appearance: Appearance) {
@@ -132,7 +134,27 @@ export class MapView {
     this.map.flyTo({ center: [lng, lat], zoom: Math.max(this.map.getZoom(), MIN_LOCATE_ZOOM) });
   }
 
+  /**
+   * Passe en mode dessin : brouillard à moitié transparent, déplacement à un doigt désactivé, un
+   * tracé dévoile des cellules (transmises par lots à `flush`). Renvoie la fonction d'arrêt, qui
+   * écrit les dernières cellules puis rétablit la vue normale.
+   */
+  startDrawing(flush: DrawFlush): () => Promise<void> {
+    void this.#stopDrawing?.();
+    const controller = new DrawController(this.map, flush);
+    this.fog.setDimmed(true);
+    const stop = async () => {
+      if (this.#stopDrawing !== stop) return;
+      this.#stopDrawing = null;
+      this.fog.setDimmed(false);
+      await controller.stop();
+    };
+    this.#stopDrawing = stop;
+    return stop;
+  }
+
   destroy(): void {
+    void this.#stopDrawing?.();
     this.#removeOverlay?.();
     this.map.remove();
     this.fog.destroy();

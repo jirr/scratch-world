@@ -1,6 +1,16 @@
 <script lang="ts" module>
   export type IconName =
-    'locate' | 'layers' | 'refresh' | 'stats' | 'import' | 'menu' | 'play' | 'pause' | 'close';
+    | 'locate'
+    | 'layers'
+    | 'refresh'
+    | 'stats'
+    | 'menu'
+    | 'play'
+    | 'pause'
+    | 'close'
+    | 'chevron'
+    | 'pencil'
+    | 'back';
 
   /** Tracé d'icône sur une grille 24×24 ; `fill` : forme pleine (sinon trait seul). */
   interface Shape {
@@ -21,15 +31,13 @@
     ],
     refresh: [{ d: 'M20 12a8 8 0 1 1-2.34-5.66L20 9' }, { d: 'M20 4v5h-5' }],
     stats: [{ d: 'M4 20h16' }, { d: 'M7 16v-5M12 16V6M17 16V9' }],
-    import: [
-      { d: 'M12 4v11' },
-      { d: 'M7.5 10.5L12 15l4.5-4.5' },
-      { d: 'M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3' },
-    ],
     menu: [{ d: 'M4 6h16M4 12h16M4 18h16' }],
     play: [{ d: 'M7 4.5v15l13-7.5z', fill: true }],
     pause: [{ d: 'M7 5h3v14H7zM14 5h3v14h-3z', fill: true }],
     close: [{ d: 'M6 6l12 12M18 6L6 18' }],
+    chevron: [{ d: 'M9 6l6 6l-6 6' }],
+    pencil: [{ d: 'M4 20l4.5-1L19 8.5L15.5 5L5 15.5z' }, { d: 'M13.5 7l3.5 3.5' }],
+    back: [{ d: 'M15 6l-6 6l6 6' }],
   };
 </script>
 

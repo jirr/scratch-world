@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { importFile } from './support/menu';
 import { luminanceAt } from './support/pixels';
 import { stubOpenFreeMap } from './support/routes';
 
@@ -27,8 +28,7 @@ test('importer un GPX affiche le récapitulatif et dévoile la carte ; le réimp
   await page.waitForTimeout(1500);
   const before = await luminanceAt(page, centerX, centerY);
 
-  await page.getByRole('button', { name: 'Importer' }).click();
-  await page.getByTestId('import-input').setInputFiles(WALK);
+  await importFile(page, WALK);
 
   const results = page.getByTestId('import-results');
   await expect(results).toContainText('walk.gpx');
@@ -41,14 +41,12 @@ test('importer un GPX affiche le récapitulatif et dévoile la carte ; le réimp
     .poll(() => luminanceAt(page, centerX, centerY), { timeout: 15_000 })
     .toBeGreaterThan(before + 60);
 
-  await page.getByRole('button', { name: 'Importer' }).click();
-  await page.getByTestId('import-input').setInputFiles(WALK);
+  await importFile(page, WALK);
   await expect(page.getByTestId('import-results')).toContainText('Déjà importé');
 });
 
 test('un format inconnu est refusé avec un message clair', async ({ page }) => {
   await page.goto('');
-  await page.getByRole('button', { name: 'Importer' }).click();
-  await page.getByTestId('import-input').setInputFiles('tests/fixtures/import/unknown.json');
+  await importFile(page, 'tests/fixtures/import/unknown.json');
   await expect(page.getByTestId('import-results')).toContainText('Format non reconnu');
 });

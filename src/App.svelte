@@ -12,7 +12,6 @@
   import { createWakeLock } from './platform/wake-lock';
   import { Recorder } from './recording/recorder.svelte';
   import BottomBar from './ui/components/BottomBar.svelte';
-  import ImportPanel from './ui/components/ImportPanel.svelte';
   import ApproximateNotice from './ui/components/ApproximateNotice.svelte';
   import InstallPrompt from './ui/components/InstallPrompt.svelte';
   import Landing from './ui/components/Landing.svelte';
@@ -34,7 +33,6 @@
   const backupSession = new BackupSession();
 
   let menuOpen = $state(false);
-  let importOpen = $state(false);
   let statsOpen = $state(false);
   let permissionOpen = $state(false);
   let approxOpen = $state(false);
@@ -105,12 +103,10 @@
     recording={recorder.state === 'recording'}
     paused={recordingPref.paused}
     {onRecord}
-    onImport={() => (importOpen = true)}
     onStats={() => (statsOpen = true)}
     onMenu={() => (menuOpen = true)}
   />
   <StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
-  <ImportPanel session={importSession} open={importOpen} onClose={() => (importOpen = false)} />
   <ApproximateNotice
     open={approxOpen}
     onRetry={() => retryToken++}
@@ -120,6 +116,7 @@
   <SettingsPanel
     open={menuOpen}
     backup={backupSession}
+    {importSession}
     onClear={() => clearAll(db)}
     onClose={() => (menuOpen = false)}
   />

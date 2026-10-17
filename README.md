@@ -14,7 +14,7 @@ Application : <https://jirr.github.io/scratch-world/>
 - Carte du monde voilée d’un brouillard (WebGL2) qui se dissipe sur les zones visitées, nord en haut.
 - **Grattage en direct** avec la géolocalisation du navigateur (application ouverte).
 - **Import** GPX, KML, Google Timeline (Android et iPhone) et `Records.json`.
-- **Statistiques** : surface dévoilée, part du monde émergé, surface par pays.
+- **Statistiques** : page plein écran à sections dépliables (monde, pays, région, département) avec une barre de progression par zone.
 - **Sauvegarde / restauration** (fusion), réglages, thèmes clair/sombre, hors ligne, installable.
 - **Français et anglais** : langue du système par défaut (anglais si elle n’est ni le français ni l’anglais), modifiable dans les réglages.
 
@@ -70,7 +70,7 @@ Formats : GPX, KML (dont `gx:Track`), Google Timeline Android (`semanticSegments
 
 ## Statistiques
 
-Surface dévoilée, nombre de cellules, part du **monde émergé** (somme des surfaces des pays Natural Earth 1:50m v5.1.2, domaine public) et surface par pays. Chaque cellule de résolution 7 (~1,4 km) est rattachée à un pays par point-dans-polygone (centre, puis sommets pour les cellules côtières, sinon « mer ») dans `stats.worker` ; le résultat est mis en cache dans la table `regionCache`, invalidée si la version du jeu de données change. `pnpm build:countries` régénère `public/data/countries-50m.v1.json`.
+Page plein écran en quatre sections dépliables : **Monde** (surface dévoilée, nombre de cellules, part du **monde émergé** = somme des surfaces des pays Natural Earth 1:50m v5.1.2, domaine public), **Pays**, **Région** et **Département** (France métropolitaine, [gregoiredavid/france-geojson](https://github.com/gregoiredavid/france-geojson), versions simplifiées). Chaque zone s'affiche dès qu'une cellule dévoilée s'y trouve, avec une barre de progression et son pourcentage, triées par pourcentage décroissant. Chaque cellule de résolution 7 (~1,4 km) est rattachée à un pays par point-dans-polygone (centre, puis sommets pour les cellules côtières, sinon « mer ») dans `stats.worker` ; les cellules françaises sont ensuite rattachées à leur région et leur département. Le résultat est mis en cache dans la table `regionCache`, invalidée si la version des jeux de données change. `pnpm build:countries` régénère `public/data/countries-50m.v1.json` et `pnpm build:france` régénère `public/data/france-admin.v1.json`.
 
 ## Sauvegarde et réglages
 

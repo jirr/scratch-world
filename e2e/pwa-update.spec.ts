@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { openMenu, openMenuSection } from './support/menu';
 import { stubOpenFreeMap } from './support/routes';
 import { startSwitchableServer, type SwitchableServer } from './support/switchable-server';
 
@@ -26,7 +27,8 @@ test('une nouvelle version déployée déclenche le toast puis la mise à jour',
   await page.goto(server.url);
 
   const readVersion = async () => {
-    await page.getByRole('button', { name: 'Menu' }).click();
+    await openMenu(page);
+    await openMenuSection(page, 'À propos');
     const text = await page.getByTestId('app-version').innerText();
     await page.keyboard.press('Escape');
     return text;

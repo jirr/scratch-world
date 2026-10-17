@@ -1,6 +1,6 @@
 import { latLngToCell } from 'h3-js';
 import { describe, expect, it } from 'vitest';
-import { createRegionLocator } from './region-locator';
+import { createZoneLocator } from './region-locator';
 
 const square = (west: number, south: number, east: number, north: number) => ({
   type: 'Polygon' as const,
@@ -15,7 +15,7 @@ const square = (west: number, south: number, east: number, north: number) => ({
   ],
 });
 
-const locate = createRegionLocator([
+const locate = createZoneLocator([
   { code: 'AA', geometry: square(0, 0, 10, 10) },
   {
     code: 'BB',
@@ -45,7 +45,7 @@ const locate = createRegionLocator([
 
 const cell7 = (lat: number, lng: number) => latLngToCell(lat, lng, 7);
 
-describe('createRegionLocator', () => {
+describe('createZoneLocator', () => {
   it('rattache par le centre, y compris pour un MultiPolygon', () => {
     expect(locate(cell7(5, 5))).toBe('AA');
     expect(locate(cell7(5, 25))).toBe('BB');
@@ -66,7 +66,20 @@ describe('createRegionLocator', () => {
     expect(locate(cell7(10.2, 5))).toBe('');
   });
 
-  it('fonctionne sans aucun pays', () => {
-    expect(createRegionLocator([])(cell7(5, 5))).toBe('');
+  it('fonctionne sans aucune zone', () => {
+    expect(createZoneLocator([])(cell7(5, 5))).toBe('');
+  });
+
+  it('distingue des zones imbriquées sur des jeux de données séparés', () => {
+    // Un « pays » et ses « départements » sont localisés par des localisateurs indépendants.
+    const country = createZoneLocator([{ code: 'FR', geometry: square(0, 0, 10, 10) }]);
+    const departments = createZoneLocator([
+      { code: '14', geometry: square(0, 0, 5, 10) },
+      { code: '50', geometry: square(5, 0, 10, 10) },
+    ]);
+    expect(country(cell7(5, 2))).toBe('FR');
+    expect(departments(cell7(5, 2))).toBe('14');
+    expect(departments(cell7(5, 8))).toBe('50');
+    expect(departments(cell7(5, 15))).toBe('');
   });
 });

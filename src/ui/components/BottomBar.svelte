@@ -6,14 +6,12 @@
     recording,
     paused,
     onRecord,
-    onImport,
     onStats,
     onMenu,
   }: {
     recording: boolean;
     paused: boolean;
     onRecord: () => void;
-    onImport: () => void;
     onStats: () => void;
     onMenu: () => void;
   } = $props();
@@ -37,9 +35,6 @@
     onclick={onRecord}
   >
     <Icon name={recording ? 'pause' : 'play'} />
-  </button>
-  <button type="button" aria-label={S.navImport} title={S.navImport} onclick={onImport}>
-    <Icon name="import" />
   </button>
   <button type="button" aria-label={S.navMenu} title={S.navMenu} onclick={onMenu}>
     <Icon name="menu" />

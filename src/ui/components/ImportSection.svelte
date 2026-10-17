@@ -2,21 +2,11 @@
   import type { ImportSession } from '../../app/import-session.svelte';
   import type { ImportResult } from '../../import/pipeline';
   import { S } from '../i18n/i18n.svelte';
+  import Section from './Section.svelte';
 
-  let { session, open, onClose }: { session: ImportSession; open: boolean; onClose: () => void } =
-    $props();
-  let dialog: HTMLDialogElement | undefined = $state();
+  /** Section « Importer des données » du menu : dépôt de fichiers, progression, résultats. */
+  let { session }: { session: ImportSession } = $props();
   let dragging = $state(false);
-  const titleId = $props.id();
-
-  $effect(() => {
-    if (!dialog) return;
-    if (open && !dialog.open) {
-      session.reset();
-      dialog.showModal();
-    }
-    if (!open && dialog.open) dialog.close();
-  });
 
   function start(list: FileList | null) {
     if (list && list.length > 0) void session.run([...list]);
@@ -31,16 +21,7 @@
   const percent = $derived(session.progress ? Math.round(session.progress.ratio * 100) : 0);
 </script>
 
-<dialog
-  class="sheet"
-  bind:this={dialog}
-  onclose={onClose}
-  oncancel={(e) => session.state === 'running' && e.preventDefault()}
-  aria-labelledby={titleId}
-  data-testid="import-panel"
->
-  <h2 id={titleId}>{S.importTitle}</h2>
-
+<Section title={S.importTitle} testid="import-section">
   {#if session.state === 'running'}
     <p data-testid="import-file">
       {session.progress?.fileName ?? ''}
@@ -72,7 +53,6 @@
     </ul>
     <p class="actions">
       <button type="button" onclick={() => session.reset()}>{S.importAgain}</button>
-      <button type="button" class="primary" onclick={() => dialog?.close()}>{S.close}</button>
     </p>
   {:else}
     <p>{S.importBody}</p>
@@ -105,19 +85,10 @@
       </label>
       <span class="muted">{S.importDrop}</span>
     </div>
-    <p class="actions">
-      <button type="button" onclick={() => dialog?.close()}>{S.close}</button>
-    </p>
   {/if}
-</dialog>
+</Section>
 
 <style>
-  dialog {
-    background: var(--surface);
-    color: var(--fg);
-    border: 1px solid var(--border);
-  }
-
   progress {
     width: 100%;
     height: 14px;

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { openMenu, openMenuSection } from './support/menu';
 import { stubOpenFreeMap } from './support/routes';
 
 test.beforeEach(async ({ context }) => {
@@ -49,6 +50,7 @@ test('« Plus tard » masque la fenêtre, même après rechargement', async ({ p
   await expect(page.getByTestId('install-prompt')).toBeHidden();
 
   // L'installation reste proposée dans les réglages.
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'À propos');
   await expect(page.getByRole('button', { name: 'Installer l’application' })).toBeVisible();
 });

@@ -19,7 +19,7 @@ export const fr = {
   settingsRecording: 'Enregistrement',
   settingsAccuracy: (m: number) => `Précision maximale acceptée (imports) : ${m} m`,
   settingsAccuracyHint:
-    'Les imports ignorent les points moins précis. En direct, la zone de découverte (~1 km) tolère jusqu’à 1 km d’imprécision.',
+    'Les imports ignorent les points moins précis. En direct, la zone de découverte (100 m) tolère jusqu’à 200 m d’imprécision.',
   settingsKeepTracks: 'Conserver les traces brutes (consomme de la place)',
   settingsWakeLock: 'Garder l’écran allumé par défaut pendant l’enregistrement',
   settingsAppearance: 'Apparence',
@@ -118,13 +118,16 @@ export const fr = {
   statsTitle: 'Statistiques',
   statsArea: 'Surface dévoilée',
   statsCells: 'Cellules',
-  statsWorld: 'du monde émergé',
+  statsWorldTitle: 'Monde',
   statsComputing: 'Calcul en cours…',
   statsFailed: 'Calcul impossible pour le moment.',
   statsEmpty: 'Rien de dévoilé pour l’instant : enregistre ou importe une trace.',
   statsCountries: 'Pays',
+  statsRegions: 'Région',
+  statsDepartments: 'Département',
+  statsNoZone: 'Aucune zone dévoilée pour l’instant.',
   statsSea: 'Mer et zones non rattachées exclues du pourcentage.',
-  statsDataset: 'Frontières : Natural Earth 1:50m.',
+  statsDataset: 'Frontières : Natural Earth 1:50m ; régions et départements : france-geojson.',
   /** Le jeu de données porte déjà les noms français (Natural Earth `NAME_FR`). */
   countryName: (_code: string, datasetName: string) => datasetName,
   lessThan: (value: string) => `< ${value}`,
@@ -155,7 +158,6 @@ export const fr = {
   cancel: 'Annuler',
   navLabel: 'Navigation principale',
   navStats: 'Stats',
-  navImport: 'Importer',
   navMenu: 'Menu',
   pinLabels: {
     idle: 'Ta position (à l’arrêt)',
@@ -164,6 +166,7 @@ export const fr = {
     vehicle: 'Ta position (en véhicule)',
   } satisfies Record<MoveMode, string>,
   locate: 'Me localiser',
+  draw: 'Dessiner',
   locating: 'Localisation en cours…',
   locateTooImprecise: (m: number) =>
     `Position trop imprécise (±${m} m) : zone non dévoilée. Réessaie dehors ou`,

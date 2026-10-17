@@ -46,7 +46,7 @@ export default defineConfig({
     {
       name: 'app',
       testMatch:
-        /(app|recording|import|stats|settings|backup|a11y|install-prompt|landing)\.spec\.ts/,
+        /(app|recording|import|stats|settings|backup|a11y|install-prompt|landing|draw)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], serviceWorkers: 'block' },
     },
     {

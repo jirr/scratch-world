@@ -24,7 +24,8 @@
     "screenshots": "playwright test --project=screenshots",
     "gen:fixtures": "tsx scripts/gen-fixtures.ts",
     "gen:cells": "tsx scripts/gen-cells.ts",
-    "build:countries": "tsx scripts/build-countries.ts"
+    "build:countries": "tsx scripts/build-countries.ts",
+    "build:france": "tsx scripts/build-france.ts"
   },
   "dependencies": {
     "@tmcw/togeojson": "^7.1.3",

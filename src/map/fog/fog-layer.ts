@@ -10,6 +10,8 @@ import { generateNoise, NOISE_SIZE } from './noise';
 import { COMPOSE_FRAG, COMPOSE_VERT, MASK_FRAG, MASK_VERT } from './shaders';
 
 const REFRESH_INTERVAL_MS = 150;
+/** Part de l'opacité du brouillard conservée en mode dessin. */
+const DIMMED_OPACITY = 0.5;
 
 interface GpuBucket extends FogBucket {
   stale: boolean;
@@ -89,6 +91,7 @@ export class FogLayer implements CustomLayerInterface {
   #noise: WebGLTexture | null = null;
   #theme = THEMES.light;
   #hidden = false;
+  #dimmed = false;
   #seq = 0;
   #lastRefresh = 0;
   #timer: ReturnType<typeof setTimeout> | null = null;
@@ -114,6 +117,12 @@ export class FogLayer implements CustomLayerInterface {
   /** Masque le brouillard (aperçu d'un style de carte). */
   setHidden(hidden: boolean): void {
     this.#hidden = hidden;
+    this.#map.triggerRepaint();
+  }
+
+  /** Mode dessin : brouillard à moitié transparent pour deviner les zones déjà dévoilées. */
+  setDimmed(dimmed: boolean): void {
+    this.#dimmed = dimmed;
     this.#map.triggerRepaint();
   }
 
@@ -235,7 +244,8 @@ export class FogLayer implements CustomLayerInterface {
     gl.uniform1f(programs.composeU.dpr, dpr);
     gl.uniform2f(programs.composeU.noiseOffset, nx, ny);
     gl.uniform3f(programs.composeU.color, ...this.#theme.color);
-    gl.uniform1f(programs.composeU.opacity, this.#theme.opacity);
+    const opacity = this.#theme.opacity * (this.#dimmed ? DIMMED_OPACITY : 1);
+    gl.uniform1f(programs.composeU.opacity, opacity);
     gl.bindVertexArray(this.#emptyVao);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     gl.bindVertexArray(null);

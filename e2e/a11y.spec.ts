@@ -1,6 +1,16 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { openMenu, openMenuSection } from './support/menu';
 import { stubOpenFreeMap } from './support/routes';
+
+const MENU_SECTIONS = [
+  'Pseudo',
+  'Enregistrement',
+  'Apparence',
+  'Importer des traces',
+  'Données',
+  'À propos',
+];
 
 test.beforeEach(async ({ context }) => {
   await stubOpenFreeMap(context);
@@ -27,7 +37,6 @@ for (const scheme of ['light', 'dark'] as const) {
 
     for (const [button, panel] of [
       ['Stats', 'stats-panel'],
-      ['Importer', 'import-panel'],
       ['Menu', 'menu-panel'],
       ['Style de carte', 'style-picker'],
     ] as const) {
@@ -38,13 +47,20 @@ for (const scheme of ['light', 'dark'] as const) {
         expect(await violations(page)).toEqual([]);
       });
     }
+
+    test('menu avec toutes les sections dépliées', async ({ page }) => {
+      await page.goto('');
+      await openMenu(page);
+      for (const title of MENU_SECTIONS) await openMenuSection(page, title);
+      expect(await violations(page)).toEqual([]);
+    });
   });
 }
 
 test('la navigation au clavier atteint chaque bouton de la barre', async ({ page }) => {
   await page.goto('');
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
-  const wanted = new Set(['Stats', 'Démarrer', 'Importer', 'Menu']);
+  const wanted = new Set(['Stats', 'Démarrer', 'Menu']);
   const seen = new Set<string>();
   for (let i = 0; i < 25 && seen.size < wanted.size; i++) {
     await page.keyboard.press('Tab');

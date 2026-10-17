@@ -28,7 +28,7 @@ export const en: Messages = {
   settingsRecording: 'Recording',
   settingsAccuracy: (m: number) => `Maximum accepted accuracy (imports): ${m} m`,
   settingsAccuracyHint:
-    'Imports skip less accurate points. Live, the discovery zone (~1 km) tolerates up to 1 km of inaccuracy.',
+    'Imports skip less accurate points. Live, the discovery zone (100 m) tolerates up to 200 m of inaccuracy.',
   settingsKeepTracks: 'Keep raw tracks (uses storage)',
   settingsWakeLock: 'Keep the screen on by default while recording',
   settingsAppearance: 'Appearance',
@@ -124,13 +124,16 @@ export const en: Messages = {
   statsTitle: 'Statistics',
   statsArea: 'Area revealed',
   statsCells: 'Cells',
-  statsWorld: 'of the world’s land',
+  statsWorldTitle: 'World',
   statsComputing: 'Computing…',
   statsFailed: 'Statistics are unavailable right now.',
   statsEmpty: 'Nothing revealed yet: record or import a track.',
   statsCountries: 'Countries',
+  statsRegions: 'Regions',
+  statsDepartments: 'Departments',
+  statsNoZone: 'No zone revealed yet.',
   statsSea: 'Sea and unassigned areas are excluded from the percentage.',
-  statsDataset: 'Borders: Natural Earth 1:50m.',
+  statsDataset: 'Borders: Natural Earth 1:50m; regions and departments: france-geojson.',
   countryName: (code: string, datasetName: string) =>
     NON_ISO_COUNTRIES[code] ??
     (/^[A-Z]{2}$/.test(code) ? regionNames.of(code) : undefined) ??
@@ -163,7 +166,6 @@ export const en: Messages = {
   cancel: 'Cancel',
   navLabel: 'Main navigation',
   navStats: 'Stats',
-  navImport: 'Import',
   navMenu: 'Menu',
   pinLabels: {
     idle: 'Your position (standing still)',
@@ -172,6 +174,7 @@ export const en: Messages = {
     vehicle: 'Your position (in a vehicle)',
   },
   locate: 'Locate me',
+  draw: 'Draw',
   locating: 'Locating…',
   locateTooImprecise: (m: number) =>
     `Position too imprecise (±${m} m): area not revealed. Try again outdoors or`,

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { openMenu, openMenuSection } from './support/menu';
 import { stubOpenFreeMap } from './support/routes';
 
 test.use({ storageState: { cookies: [], origins: [] }, permissions: ['geolocation'] });
@@ -27,7 +28,8 @@ test('la page d’accueil présente l’app, demande un pseudo puis ouvre la car
   await expect(landing).toBeHidden();
   await expect(page.locator('.maplibregl-canvas')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Menu' }).click();
+  await openMenu(page);
+  await openMenuSection(page, 'Pseudo');
   await expect(page.getByTestId('pseudo-setting')).toHaveValue('Léa');
 
   // Mémorisé : plus de page d'accueil au rechargement.
