@@ -85,7 +85,17 @@
       const current = view;
       void import('../../dev/dev-hooks').then((m) => m.installDevHooks(current));
     }
-    return () => view?.destroy();
+    // À l'ouverture et au retour au premier plan : position fraîche et écran recentré dessus, sans
+    // indicateur ni fenêtre en cas d'échec (le bouton « Me localiser » reste là pour ça).
+    void locate(false);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !drawing) void locate(false);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      view?.destroy();
+    };
   });
 
   // Pendant l'enregistrement, le marqueur suit la position sans déplacer la caméra.
@@ -103,24 +113,36 @@
     }
   });
 
-  async function locate() {
-    locateFailed = false;
-    locateAccuracy = null;
-    locating = true;
+  /** Localisation automatique en cours (ouverture, retour au premier plan) : jamais deux à la fois. */
+  let autoLocating = false;
+
+  /** `manual` : clic sur « Me localiser » (indicateur, erreurs et fenêtre de refus affichés). */
+  async function locate(manual = true) {
+    if (manual ? locating : autoLocating) return;
+    if (manual) {
+      locateFailed = false;
+      locateAccuracy = null;
+      locating = true;
+    } else {
+      autoLocating = true;
+    }
     try {
       const fix = await positionSource.getCurrent();
-      view?.showPosition(fix.lng, fix.lat);
+      if (manual || !drawing) view?.showPosition(fix.lng, fix.lat);
       // Dévoile une petite zone autour de la position, sans attendre un déplacement.
       if (fix.accuracy <= LOCATE_MAX_ACCURACY_M) {
+        locateAccuracy = null;
         await addCells(db, startZoneCells(fix.lat, fix.lng, discoveryRadiusM('idle')));
       } else {
         locateAccuracy = Math.round(fix.accuracy);
       }
     } catch (error) {
+      if (!manual) return;
       if (error instanceof PositionError && error.status === 'denied') onPermissionDenied();
       else locateFailed = true;
     } finally {
-      locating = false;
+      if (manual) locating = false;
+      else autoLocating = false;
     }
   }
 </script>
@@ -135,7 +157,7 @@
   <button
     type="button"
     class="round locate"
-    onclick={locate}
+    onclick={() => locate()}
     disabled={locating}
     aria-label={S.locate}
     title={S.locate}

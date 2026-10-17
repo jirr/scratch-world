@@ -45,6 +45,26 @@ test.describe('géolocalisation accordée', () => {
       timeout: 15_000,
     });
   });
+
+  test('à l’ouverture, la position est actualisée et l’écran recentré dessus', async ({ page }) => {
+    // Dernière vue enregistrée loin de la position (Atlantique) : elle ne doit pas être conservée.
+    await page.addInitScript(() =>
+      localStorage.setItem('sw:camera', JSON.stringify({ lng: -30, lat: 20, zoom: 3 })),
+    );
+    await page.goto('');
+    await expect(page.locator('.maplibregl-marker')).toBeVisible({ timeout: 15_000 });
+    await expect
+      .poll(
+        async () => {
+          const camera = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('sw:camera') ?? 'null'),
+          );
+          return camera && Math.hypot(camera.lng - 2.2945, camera.lat - 48.8584) < 0.01;
+        },
+        { timeout: 15_000 },
+      )
+      .toBe(true);
+  });
 });
 
 test.describe('localisation imprécise', () => {
@@ -77,10 +97,11 @@ test.describe('localisation imprécise', () => {
     page,
   }) => {
     await page.goto('');
+    // La localisation automatique à l'ouverture attend jusqu'à ~12 s une position plus précise.
     await expect(
       page.getByRole('status').filter({ hasText: 'Position trop imprécise' }),
     ).toBeVisible({
-      timeout: 10_000,
+      timeout: 20_000,
     });
     await expect(page.getByTestId('approximate-notice')).toBeHidden();
   });
