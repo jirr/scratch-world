@@ -26,7 +26,7 @@ async function readCells(page: Page): Promise<number> {
   return value;
 }
 
-test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoile un petit cercle à pied', async ({
+test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoile un disque de 500 m', async ({
   page,
   context,
 }) => {
@@ -39,9 +39,9 @@ test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoi
   await expect(page.getByTestId('recording-indicator')).toHaveCount(0);
   await expect(page.getByText(/Enregistrement ·/)).toHaveCount(0);
 
-  await expect.poll(() => readCells(page), { timeout: 15_000 }).toBeGreaterThanOrEqual(3);
+  await expect.poll(() => readCells(page), { timeout: 15_000 }).toBeGreaterThanOrEqual(40);
   const start = await readCells(page);
-  expect(start).toBeLessThan(15);
+  expect(start).toBeLessThan(80);
 
   for (let i = 1; i <= 12; i++) {
     await context.setGeolocation({ ...START, latitude: START.latitude + i * STEP_DEG });
@@ -52,8 +52,18 @@ test('l’enregistrement démarre tout seul, sans bandeau ni minuteur, et dévoi
   // Le pictogramme de position suit la vitesse (~50 m/s simulés : véhicule).
   await expect(page.locator('.pin')).toHaveAttribute('data-mode', 'vehicle');
 
-  // Une position trop imprécise (> 1 km) est ignorée.
-  const before = await readCells(page);
+  // Une position trop imprécise (> 1 km) est ignorée. On attend d'abord que les lots en cours soient écrits.
+  let before = -1;
+  await expect
+    .poll(
+      async () => {
+        const previous = before;
+        before = await readCells(page);
+        return before === previous;
+      },
+      { timeout: 15_000, intervals: [2500] },
+    )
+    .toBe(true);
   await context.setGeolocation({ latitude: 49.5, longitude: 2.35, accuracy: 1500 });
   await page.waitForTimeout(3000);
   expect(await readCells(page)).toBe(before);

@@ -89,22 +89,22 @@ describe('Recorder', () => {
     expect(await db.chunks.count()).toBe(0);
   });
 
-  it('le premier point, un peu imprécis, dévoile une petite zone sans attendre un déplacement', async () => {
+  it('le premier point, un peu imprécis, dévoile un disque de 500 m sans attendre un déplacement', async () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 80)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBeGreaterThanOrEqual(3);
-    expect(recorder.cellsAdded).toBeLessThan(15);
+    expect(recorder.cellsAdded).toBeGreaterThanOrEqual(40);
+    expect(recorder.cellsAdded).toBeLessThan(80);
   });
 
-  it('à pied, le rayon reste petit et une position à 900 m est ignorée', async () => {
+  it('tolère jusqu’à 1 km d’imprécision : une position à 900 m est acceptée', async () => {
     await recorder.start({ wakeLock: false });
     source.onFix(walk(0, 1, 900)[0] as PositionFix);
     await recorder.stop();
-    expect(recorder.cellsAdded).toBe(0);
+    expect(recorder.cellsAdded).toBeGreaterThan(0);
   });
 
-  it('à pied, dévoile une petite zone autour de chaque tronçon parcouru', async () => {
+  it('à pied, dévoile la zone autour de chaque tronçon parcouru', async () => {
     await recorder.start({ wakeLock: false });
     for (const fix of walk(0, 40, 10, 1.4)) source.onFix(fix); // 1,4 m/s
     await recorder.stop();
@@ -112,11 +112,12 @@ describe('Recorder', () => {
     expect(recorder.cellsAdded).toBeLessThan(80);
   });
 
-  it('en véhicule, la zone dévoilée est bien plus large', async () => {
+  it('en véhicule, dévoile le même rayon tout le long du trajet', async () => {
     await recorder.start({ wakeLock: false });
-    for (const fix of walk(0, 60, 10, 30)) source.onFix(fix); // 30 m/s
+    for (const fix of walk(0, 60, 10, 30)) source.onFix(fix); // 30 m/s, 1,8 km
     await recorder.stop();
-    expect(recorder.cellsAdded).toBeGreaterThan(300);
+    // Ruban de 1 km de large sur 1,8 km : bien plus que le disque de départ seul.
+    expect(recorder.cellsAdded).toBeGreaterThan(150);
   });
 
   it('estime la vitesse pour le pictogramme de position', async () => {
