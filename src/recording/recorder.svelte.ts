@@ -113,7 +113,7 @@ export class Recorder {
     if (this.state !== 'recording' || !this.#filter) return;
     this.lastFix = fix;
     this.speedMps = this.#speed.push(fix);
-    // Rayon de découverte selon la vitesse : petit à pied (détail du chemin), large en véhicule.
+    // Rayon de découverte (identique pour tous les modes de déplacement).
     const radiusM = discoveryRadiusM(moveMode(this.speedMps));
     if (fix.accuracy > maxAccuracyForRadius(radiusM)) return;
     const point: TrackPoint = { lat: fix.lat, lng: fix.lng, t: fix.timestamp, acc: fix.accuracy };

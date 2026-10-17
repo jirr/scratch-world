@@ -43,8 +43,8 @@ export interface FogStats {
 }
 
 const THEMES = {
-  dark: { color: [30 / 255, 36 / 255, 50 / 255] as const, opacity: 0.9 },
-  light: { color: [16 / 255, 18 / 255, 24 / 255] as const, opacity: 0.94 },
+  dark: { color: [30 / 255, 36 / 255, 50 / 255] as const, opacity: 1 },
+  light: { color: [16 / 255, 18 / 255, 24 / 255] as const, opacity: 1 },
 };
 
 function compile(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {

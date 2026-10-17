@@ -33,6 +33,8 @@
     if (open && !dialog.open) {
       cleared = false;
       dialog.showModal();
+      // Pas d'autofocus sur le pseudo (clavier mobile) : focus sur le panneau lui-même.
+      dialog.focus();
     }
     if (!open && dialog.open) dialog.close();
   });
@@ -56,6 +58,7 @@
   bind:this={dialog}
   onclose={onClose}
   aria-labelledby={titleId}
+  tabindex="-1"
   data-testid="menu-panel"
 >
   <h2 id={titleId}>{S.menuTitle}</h2>

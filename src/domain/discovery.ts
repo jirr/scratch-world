@@ -1,11 +1,11 @@
 import type { MoveMode } from './speed-mode';
 
-/** Rayon (m) de la zone dévoilée selon la vitesse : petit à pied (détail des chemins), large en véhicule. */
+/** Rayon (m) de la zone dévoilée, identique pour tous les modes de déplacement. */
 export const DISCOVERY_RADIUS_BY_MODE: Record<MoveMode, number> = {
-  idle: 150,
-  walk: 150,
-  scooter: 400,
-  vehicle: 1000,
+  idle: 500,
+  walk: 500,
+  scooter: 500,
+  vehicle: 500,
 };
 
 export function discoveryRadiusM(mode: MoveMode): number {
