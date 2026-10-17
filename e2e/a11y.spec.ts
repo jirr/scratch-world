@@ -48,7 +48,9 @@ test('la navigation au clavier atteint chaque bouton de la barre', async ({ page
   const seen = new Set<string>();
   for (let i = 0; i < 25 && seen.size < wanted.size; i++) {
     await page.keyboard.press('Tab');
-    const label = await page.evaluate(() => document.activeElement?.textContent?.trim() ?? '');
+    const label = await page.evaluate(
+      () => document.activeElement?.getAttribute('aria-label') ?? '',
+    );
     if (wanted.has(label)) seen.add(label);
   }
   expect([...seen].sort()).toEqual([...wanted].sort());

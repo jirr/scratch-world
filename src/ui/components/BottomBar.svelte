@@ -17,16 +17,33 @@
     onStats: () => void;
     onMenu: () => void;
   } = $props();
+
+  const recordLabel = $derived(
+    recording ? S.recordPause : paused ? S.recordResume : S.recordStartNow,
+  );
 </script>
 
 <nav class="bar" aria-label={S.navLabel} data-testid="bottom-bar">
-  <button type="button" onclick={onStats}><Icon name="stats" /><span>{S.navStats}</span></button>
-  <button type="button" class="fab" class:paused={!recording} onclick={onRecord}>
-    <Icon name={recording ? 'pause' : 'play'} />
-    <span>{recording ? S.recordPause : paused ? S.recordResume : S.recordStartNow}</span>
+  <!-- Icônes seules : le libellé reste accessible (aria-label) et en info-bulle (title). -->
+  <button type="button" aria-label={S.navStats} title={S.navStats} onclick={onStats}>
+    <Icon name="stats" />
   </button>
-  <button type="button" onclick={onImport}><Icon name="import" /><span>{S.navImport}</span></button>
-  <button type="button" onclick={onMenu}><Icon name="menu" /><span>{S.navMenu}</span></button>
+  <button
+    type="button"
+    class="fab"
+    class:paused={!recording}
+    aria-label={recordLabel}
+    title={recordLabel}
+    onclick={onRecord}
+  >
+    <Icon name={recording ? 'pause' : 'play'} />
+  </button>
+  <button type="button" aria-label={S.navImport} title={S.navImport} onclick={onImport}>
+    <Icon name="import" />
+  </button>
+  <button type="button" aria-label={S.navMenu} title={S.navMenu} onclick={onMenu}>
+    <Icon name="menu" />
+  </button>
 </nav>
 
 <style>
@@ -45,16 +62,12 @@
 
   button {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
     flex: 1;
     min-width: 0;
     min-height: 52px;
     padding: 4px 6px;
-    font-size: 0.8125rem;
-    font-weight: 500;
   }
 
   .fab {
@@ -62,8 +75,6 @@
     background: var(--accent);
     color: var(--accent-fg);
     border-color: var(--accent);
-    font-size: 0.9375rem;
-    font-weight: 700;
   }
 
   .fab.paused {
