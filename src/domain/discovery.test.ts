@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { discoveryRadiusM, maxAccuracyForRadius, refreshDistanceM } from './discovery';
 
 describe('rayon de découverte', () => {
-  it('vaut 500 m quel que soit le mode de déplacement', () => {
+  it('vaut 100 m quel que soit le mode de déplacement', () => {
     for (const mode of ['idle', 'walk', 'scooter', 'vehicle'] as const) {
-      expect(discoveryRadiusM(mode)).toBe(500);
+      expect(discoveryRadiusM(mode)).toBe(100);
     }
   });
 

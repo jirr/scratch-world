@@ -39,9 +39,9 @@ test.describe('géolocalisation accordée', () => {
     await page.getByRole('button', { name: 'Me localiser' }).click();
     await expect(page.locator('.maplibregl-marker')).toBeVisible();
 
-    // « Me localiser » dévoile un disque de 500 m (~60 cellules) sans déplacement.
+    // « Me localiser » dévoile un disque de 100 m (quelques cellules) sans déplacement.
     await page.getByRole('button', { name: 'Stats' }).click();
-    await expect(page.getByTestId('stats-cells')).toHaveText(/^[4-7][0-9]$/, {
+    await expect(page.getByTestId('stats-cells')).toHaveText(/^[1-7]$/, {
       timeout: 15_000,
     });
   });
