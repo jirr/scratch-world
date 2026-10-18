@@ -1,11 +1,11 @@
 import {
   PositionError,
   type PositionFix,
+  type PositionPermission,
   type PositionSource,
   type PositionStatus,
 } from './position-source';
-
-import { BEST_FIX_TIMEOUT_MS, GOOD_ACCURACY_M } from '../../domain/config';
+import { bestFix } from './best-fix';
 
 const OPTIONS: PositionOptions = { enableHighAccuracy: true, maximumAge: 0, timeout: 30_000 };
 
@@ -24,7 +24,9 @@ function toError(error: GeolocationPositionError): PositionError {
 /** Seul point d'entrée vers `navigator.geolocation`. */
 export class BrowserPositionSource implements PositionSource {
   readonly kind = 'browser';
+  /** Le navigateur coupe la géolocalisation dès que la page est masquée (arrière-plan, verrouillage). */
   readonly supportsBackground = false;
+  readonly openSettings = null;
   #watchId: number | null = null;
 
   async start(
@@ -56,41 +58,27 @@ export class BrowserPositionSource implements PositionSource {
     this.#watchId = null;
   }
 
-  /**
-   * Meilleure position obtenue en quelques secondes. Sur Android, le premier fix est souvent un fix
-   * réseau grossier (plusieurs km) avant que le GPS n'accroche : on observe donc la position et on
-   * garde la plus précise, en s'arrêtant dès qu'elle est assez bonne.
-   */
   getCurrent(): Promise<PositionFix> {
-    return new Promise((resolve, reject) => {
-      if (!('geolocation' in navigator)) {
-        reject(new PositionError('unavailable', 'Géolocalisation non prise en charge'));
-        return;
-      }
-      let best: PositionFix | null = null;
-      let lastError: PositionError | null = null;
-      let finished = false;
-      const finish = () => {
-        if (finished) return;
-        finished = true;
-        navigator.geolocation.clearWatch(watchId);
-        clearTimeout(timer);
-        if (best) resolve(best);
-        else reject(lastError ?? new PositionError('unavailable', 'Aucune position reçue'));
-      };
+    if (!('geolocation' in navigator)) {
+      return Promise.reject(
+        new PositionError('unavailable', 'Géolocalisation non prise en charge'),
+      );
+    }
+    return bestFix((onFix, onError) => {
       const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const fix = toFix(position);
-          if (!best || fix.accuracy < best.accuracy) best = fix;
-          if (fix.accuracy <= GOOD_ACCURACY_M) finish();
-        },
-        (error) => {
-          lastError = toError(error);
-          if (error.code === error.PERMISSION_DENIED) finish();
-        },
+        (position) => onFix(toFix(position)),
+        (error) => onError(toError(error)),
         OPTIONS,
       );
-      const timer = setTimeout(finish, BEST_FIX_TIMEOUT_MS);
+      return () => navigator.geolocation.clearWatch(watchId);
     });
+  }
+
+  async permission(): Promise<PositionPermission> {
+    try {
+      return (await navigator.permissions?.query({ name: 'geolocation' }))?.state ?? 'prompt';
+    } catch {
+      return 'prompt';
+    }
   }
 }

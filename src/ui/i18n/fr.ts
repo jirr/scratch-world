@@ -155,6 +155,9 @@ export const fr = {
   recordResume: 'Reprendre',
   recordStartNow: 'Démarrer',
   paused: 'Scratch en pause : la carte ne se dévoile plus',
+  trackingNoticeTitle: 'Scratch World gratte la carte',
+  trackingNoticeBody:
+    'Ta position dévoile la carte, même écran verrouillé. Mets en pause dans l’application pour arrêter.',
   cancel: 'Annuler',
   navLabel: 'Navigation principale',
   navStats: 'Stats',
@@ -180,6 +183,12 @@ export const fr = {
     'Android (Chrome) : icône cadenas à côté de l’adresse › Autorisations › Position › choisis « Précise ». Sinon : Réglages Android › Applications › Chrome › Autorisations › Position › « Utiliser la position exacte ».',
   approxRetry: 'Réessayer',
   approxReload: 'Si rien ne change, recharge la page.',
+  approxAppBody:
+    'Ton appareil ne partage qu’une position approximative avec Scratch World : impossible de gratter la carte. Autorise la position exacte pour l’application, puis réessaie.',
+  approxAppIos: 'iPhone : Réglages › Scratch World › Position › active « Position exacte ».',
+  approxAppAndroid:
+    'Android : Réglages › Applications › Scratch World › Autorisations › Position › active « Utiliser la position exacte ».',
+  openSettings: 'Ouvrir les réglages',
   locateUnavailable: 'Position indisponible pour le moment.',
   close: 'Fermer',
   storagePersisted: 'Stockage persistant : oui',
@@ -191,6 +200,10 @@ export const fr = {
   permissionIos: 'iPhone : Réglages › Confidentialité › Service de localisation › Safari.',
   permissionAndroid:
     'Android (Chrome) : icône cadenas à côté de l’adresse › Autorisations › Position.',
+  permissionAppIos:
+    'iPhone : Réglages › Scratch World › Position › « Lorsque l’app est active » ou « Toujours », avec « Position exacte ».',
+  permissionAppAndroid:
+    'Android : Réglages › Applications › Scratch World › Autorisations › Position › « Autoriser seulement si l’appli est en cours d’utilisation », avec « Utiliser la position exacte ». Vérifie aussi que la localisation de l’appareil est activée.',
   webglTitle: 'WebGL2 requis',
   webglBody:
     'Cet appareil ou ce navigateur ne propose pas WebGL2, nécessaire pour afficher la carte. Essaie un navigateur récent (Chrome, Safari, Firefox).',

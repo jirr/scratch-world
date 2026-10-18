@@ -11,3 +11,5 @@ docs/screenshots
 public/data
 tests/fixtures
 pnpm-lock.yaml
+android
+ios

@@ -1,12 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ScratchDb } from '../data/db';
 import { setSetting } from '../data/settings-store';
-import type { PositionFix, PositionSource, PositionStatus } from '../platform/position';
+import type {
+  PositionFix,
+  PositionPermission,
+  PositionSource,
+  PositionStatus,
+} from '../platform/position';
 import { Recorder } from './recorder.svelte';
 
 class FakeSource implements PositionSource {
   readonly kind = 'fake';
   readonly supportsBackground = false;
+  readonly openSettings = null;
   onFix: (fix: PositionFix) => void = () => {};
   onStatus: (status: PositionStatus) => void = () => {};
   stopped = false;
@@ -22,6 +28,10 @@ class FakeSource implements PositionSource {
 
   getCurrent(): Promise<PositionFix> {
     return Promise.reject(new Error('inutilisé'));
+  }
+
+  async permission(): Promise<PositionPermission> {
+    return 'granted';
   }
 }
 

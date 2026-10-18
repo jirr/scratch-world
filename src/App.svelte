@@ -23,10 +23,15 @@
   import PausedBadge from './ui/components/PausedBadge.svelte';
   import StatsPanel from './ui/components/StatsPanel.svelte';
   import UpdateToast from './ui/components/UpdateToast.svelte';
-  import { i18n } from './ui/i18n/i18n.svelte';
+  import { i18n, S } from './ui/i18n/i18n.svelte';
   import { initSettings, settings } from './ui/state/settings.svelte';
 
-  const recorder = new Recorder({ source: createPositionSource(), db, wakeLock: createWakeLock() });
+  // Une seule source pour l'enregistrement et « Me localiser » : en natif, le plugin n'a qu'un flux.
+  const positionSource = createPositionSource(() => ({
+    title: S.trackingNoticeTitle,
+    message: S.trackingNoticeBody,
+  }));
+  const recorder = new Recorder({ source: positionSource, db, wakeLock: createWakeLock() });
 
   const importSession = new ImportSession();
   const statsClient = new StatsClient();
@@ -73,12 +78,7 @@
     autoStarted = true;
     if (recordingPref.paused) return;
     void (async () => {
-      const state = cameFromLanding
-        ? 'prompt'
-        : await navigator.permissions
-            ?.query({ name: 'geolocation' })
-            .then((s) => s.state)
-            .catch(() => 'prompt');
+      const state = cameFromLanding ? 'prompt' : await positionSource.permission();
       if (state === 'granted' || cameFromLanding) await startRecording();
     })();
   });
@@ -92,6 +92,7 @@
 {:else}
   <MapScreen
     {recorder}
+    {positionSource}
     {retryToken}
     onPermissionDenied={() => (permissionOpen = true)}
     onApproximate={() => (approxOpen = true)}
@@ -109,10 +110,15 @@
   <StatsPanel client={statsClient} open={statsOpen} onClose={() => (statsOpen = false)} />
   <ApproximateNotice
     open={approxOpen}
+    openSettings={positionSource.openSettings}
     onRetry={() => retryToken++}
     onClose={() => (approxOpen = false)}
   />
-  <PermissionNotice open={permissionOpen} onClose={() => (permissionOpen = false)} />
+  <PermissionNotice
+    open={permissionOpen}
+    openSettings={positionSource.openSettings}
+    onClose={() => (permissionOpen = false)}
+  />
   <SettingsPanel
     open={menuOpen}
     backup={backupSession}

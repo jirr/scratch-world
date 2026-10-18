@@ -1,3 +1,4 @@
+import { isNativeApp } from '../platform/native';
 import { busy } from './busy.svelte';
 
 const DISMISS_KEY = 'sw:install-dismissed';
@@ -15,7 +16,9 @@ let installed = $state(false);
 let dismissedAt = $state(Number(localStorage.getItem(DISMISS_KEY) ?? 0));
 let ready = $state(false);
 
+/** Déjà installée : application native, ou PWA lancée depuis l'écran d'accueil. */
 const standalone =
+  isNativeApp ||
   window.matchMedia('(display-mode: standalone)').matches ||
   (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
@@ -25,6 +28,9 @@ const isIos =
   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 export const installState = {
+  get isInstalled(): boolean {
+    return standalone || installed;
+  },
   /** Installation en un clic possible (Chrome, Edge, Android). */
   get canPrompt(): boolean {
     return deferred !== null && !installed;

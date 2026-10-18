@@ -1,7 +1,16 @@
 <script lang="ts">
   import { S } from '../i18n/i18n.svelte';
 
-  let { open, onClose }: { open: boolean; onClose: () => void } = $props();
+  let {
+    open,
+    openSettings,
+    onClose,
+  }: {
+    open: boolean;
+    /** Application native : ouvre ses réglages (null dans le navigateur). */
+    openSettings: (() => Promise<void>) | null;
+    onClose: () => void;
+  } = $props();
   let dialog: HTMLDialogElement | undefined = $state();
   const titleId = $props.id();
 
@@ -22,10 +31,20 @@
   <p>{S.permissionBody}</p>
   <p>{S.permissionHowTo}</p>
   <ul>
-    <li>{S.permissionIos}</li>
-    <li>{S.permissionAndroid}</li>
+    {#if openSettings}
+      <li>{S.permissionAppIos}</li>
+      <li>{S.permissionAppAndroid}</li>
+    {:else}
+      <li>{S.permissionIos}</li>
+      <li>{S.permissionAndroid}</li>
+    {/if}
   </ul>
-  <button type="button" class="primary" onclick={() => dialog?.close()}>{S.close}</button>
+  <p class="actions">
+    {#if openSettings}
+      <button type="button" onclick={() => void openSettings()}>{S.openSettings}</button>
+    {/if}
+    <button type="button" class="primary" onclick={() => dialog?.close()}>{S.close}</button>
+  </p>
 </dialog>
 
 <style>
@@ -35,5 +54,11 @@
     color: var(--fg);
     border: 1px solid var(--border);
     border-radius: 14px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
   }
 </style>

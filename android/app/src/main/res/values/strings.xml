@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Scratch World</string>
+    <string name="title_activity_main">Scratch World</string>
+    <string name="package_name">io.github.jirr.scratchworld</string>
+    <string name="custom_url_scheme">io.github.jirr.scratchworld</string>
+    <!-- Notification de @capgo/background-geolocation pendant l'enregistrement (voir son README). -->
+    <string name="capacitor_background_geolocation_notification_channel_name">Live scratching</string>
+    <string name="capacitor_background_geolocation_notification_icon" translatable="false">drawable/ic_stat_scratch</string>
+    <string name="capacitor_background_geolocation_notification_color" translatable="false">#1c6f8c</string>
+</resources>

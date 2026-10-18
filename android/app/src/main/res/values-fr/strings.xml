@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="capacitor_background_geolocation_notification_channel_name">Grattage en direct</string>
+</resources>
