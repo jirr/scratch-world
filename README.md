@@ -3,7 +3,7 @@
 [![CI](https://github.com/jirr/scratch-world/actions/workflows/ci.yml/badge.svg)](https://github.com/jirr/scratch-world/actions/workflows/ci.yml)
 [![Deploy](https://github.com/jirr/scratch-world/actions/workflows/deploy.yml/badge.svg)](https://github.com/jirr/scratch-world/actions/workflows/deploy.yml)
 
-PWA « carte du monde à gratter » : un brouillard sombre recouvre la carte et se dissipe sur les zones où tu es allé (position en direct quand l'app est ouverte, ou import GPX / KML / Google Timeline).
+PWA « carte du monde à gratter » : un brouillard sombre recouvre la carte et se dissipe sur les zones où tu es allé (position en direct, ou import GPX / KML / Google Timeline). Le même code est empaqueté en applications Android et iOS (Capacitor), qui continuent de gratter écran verrouillé.
 
 **Local-first : aucun backend, aucune donnée de localisation ne quitte l'appareil.**
 
@@ -12,7 +12,7 @@ Application : <https://jirr.github.io/scratch-world/>
 ## Fonctionnalités
 
 - Carte du monde voilée d’un brouillard (WebGL2) qui se dissipe sur les zones visitées, nord en haut.
-- **Grattage en direct** avec la géolocalisation du navigateur (application ouverte).
+- **Grattage en direct** : dans le navigateur (PWA) tant que l’application est au premier plan ; dans les applications Android et iOS, aussi en arrière-plan et écran verrouillé.
 - **Import** GPX, KML, Google Timeline (Android et iPhone) et `Records.json`.
 - **Statistiques** : page plein écran à sections dépliables (monde, pays, région, département) avec une barre de progression par zone.
 - **Sauvegarde / restauration** (fusion), réglages, thèmes clair/sombre, hors ligne, installable.
@@ -40,6 +40,7 @@ pnpm dev
 | `pnpm typecheck`         | `tsc` + `svelte-check`                                             |
 | `pnpm test` / `test:cov` | Vitest (avec couverture)                                           |
 | `pnpm e2e`               | Playwright (Chromium)                                              |
+| `pnpm cap:sync`          | Build web (base `/`) copié dans `android/` et `ios/` (Capacitor)   |
 
 Les tests de bout en bout s'exécutent sur un build servi sous `/scratch-world/` :
 
@@ -59,6 +60,7 @@ TypeScript strict, Svelte 5 (sans SvelteKit), Vite. Les couches sont séparées 
 - `src/ui/` : composants Svelte ; n'accède pas à IndexedDB directement
 - `src/app/` : composition (mise à jour de la PWA, registre « occupé »)
 - `src/sw.ts` : service worker (precache + caches de tuiles)
+- `src/platform/` : accès à l'appareil ; `position/` choisit la source de position (navigateur, ou plugin natif dans les applications Capacitor : `capacitor.config.ts`, `android/`, `ios/`)
 
 ## Brouillard
 
@@ -105,6 +107,21 @@ La géolocalisation et l'installation exigent HTTPS. Options :
 - `pnpm build && pnpm preview --host`, puis `cloudflared tunnel --url http://localhost:4173` (les hôtes `*.trycloudflare.com` sont autorisés) ;
 - `mkcert` avec un certificat local installé sur le téléphone.
 
+## Applications natives (Android, iOS)
+
+Un navigateur coupe la géolocalisation dès que la page est masquée (application en arrière-plan, écran verrouillé) : Chrome comme Safari arrêtent `watchPosition`, et aucune API web ne permet un suivi en arrière-plan. Les applications natives emballent le même build web avec [Capacitor](https://capacitorjs.com/) 8 et le plugin [`@capgo/background-geolocation`](https://github.com/Cap-go/capacitor-background-geolocation) (licence MPL-2.0) :
+
+- **Android** : pendant l'enregistrement, un service de premier plan suit la position et affiche la notification « Scratch World gratte la carte » (autorisation de notification demandée sur Android 13+). Pas d'autorisation « toujours » : le service démarre application ouverte. Après quelques minutes écran éteint, la WebView suspend ses minuteries et IndexedDB : les positions continuent d'arriver et sont gardées en mémoire, mais ne sont écrites qu'au retour au premier plan (un téléphone qui s'éteint avant perd ce trajet).
+- **iOS** : mode d'arrière-plan `location` (indicateur bleu dans la barre d'état) ; l'autorisation demandée est « Toujours », « Lorsque l'app est active » suffit si l'enregistrement a démarré application ouverte. Textes des demandes : `ios/App/App/Info.plist` (anglais) et `fr.lproj/InfoPlist.strings`.
+- L'enregistrement et « Me localiser » partagent le flux du plugin (`src/platform/position/capacitor-position-source.ts`) ; le suivi en arrière-plan ne tourne que pendant l'enregistrement (Pause l'arrête).
+- Pas de service worker ni de recherche de mise à jour : le code web est livré avec l'application.
+
+Après `pnpm install` ou toute modification du code web : `pnpm cap:sync` (les chemins vers `node_modules/.pnpm` de `android/capacitor.settings.gradle` et `ios/App/CapApp-SPM/Package.swift` sont régénérés).
+
+**Android** (JDK 21, Android SDK 36, `ANDROID_HOME` défini) : `cd android && ./gradlew assembleDebug` (`gradlew.bat` sous Windows), puis `adb install -r app/build/outputs/apk/debug/app-debug.apk` ; ou `pnpm exec cap run android`. Une version publiée sur le Play Store doit déclarer le type de service de premier plan « location ».
+
+**iOS** (macOS, Xcode) : `pnpm exec cap open ios`, choisir l'équipe de signature, lancer sur un iPhone. L'App Store demande de justifier l'usage de la position en arrière-plan.
+
 ## Tests et documentation
 
 - Tests unitaires et e2e : voir les scripts ci-dessus (`pnpm test:cov`, `pnpm e2e`) ; mesures de performance : [docs/performance.md](docs/performance.md).
@@ -112,7 +129,7 @@ La géolocalisation et l'installation exigent HTTPS. Options :
 
 ## Limites connues
 
-Une PWA ne peut pas suivre la position en arrière-plan : l'enregistrement en direct n'est actif que l'application ouverte. L'abstraction `PositionSource` prépare une enveloppe Capacitor.
+Dans le navigateur (PWA), rien n'est gratté pendant que l'application est en arrière-plan ou l'écran verrouillé : seules les applications natives suivent la position dans ce cas. Au retour au premier plan, un trajet de moins de 5 km et 10 min est relié en ligne droite ; au-delà, seule la nouvelle position est dévoilée (importer Google Timeline pour combler).
 
 ## Données personnelles
 

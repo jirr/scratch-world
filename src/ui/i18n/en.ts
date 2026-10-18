@@ -163,6 +163,9 @@ export const en: Messages = {
   recordResume: 'Resume',
   recordStartNow: 'Start',
   paused: 'Scratching paused: the map is no longer revealed',
+  trackingNoticeTitle: 'Scratch World is scratching the map',
+  trackingNoticeBody:
+    'Your location reveals the map, even with the screen locked. Pause in the app to stop.',
   cancel: 'Cancel',
   navLabel: 'Main navigation',
   navStats: 'Stats',
@@ -188,6 +191,12 @@ export const en: Messages = {
     'Android (Chrome): lock icon next to the address › Permissions › Location › choose “Precise”. Otherwise: Android Settings › Apps › Chrome › Permissions › Location › “Use precise location”.',
   approxRetry: 'Try again',
   approxReload: 'If nothing changes, reload the page.',
+  approxAppBody:
+    'Your device only shares an approximate position with Scratch World: the map can’t be scratched. Allow precise location for the app, then try again.',
+  approxAppIos: 'iPhone: Settings › Scratch World › Location › turn on “Precise Location”.',
+  approxAppAndroid:
+    'Android: Settings › Apps › Scratch World › Permissions › Location › turn on “Use precise location”.',
+  openSettings: 'Open settings',
   locateUnavailable: 'Position unavailable right now.',
   close: 'Close',
   storagePersisted: 'Persistent storage: yes',
@@ -198,6 +207,10 @@ export const en: Messages = {
   permissionHowTo: 'To allow it again:',
   permissionIos: 'iPhone: Settings › Privacy & Security › Location Services › Safari.',
   permissionAndroid: 'Android (Chrome): lock icon next to the address › Permissions › Location.',
+  permissionAppIos:
+    'iPhone: Settings › Scratch World › Location › “While Using the App” or “Always”, with “Precise Location”.',
+  permissionAppAndroid:
+    'Android: Settings › Apps › Scratch World › Permissions › Location › “Allow only while using the app”, with “Use precise location”. Also check that device location is turned on.',
   webglTitle: 'WebGL2 required',
   webglBody:
     'This device or browser doesn’t support WebGL2, which is needed to display the map. Try a recent browser (Chrome, Safari, Firefox).',

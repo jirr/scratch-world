@@ -40,16 +40,18 @@
     <button type="submit" class="primary">{S.landingStart}</button>
   </form>
 
-  <section class="install" aria-labelledby="install-title">
-    <h2 id="install-title">{S.landingInstallTitle}</h2>
-    {#if installState.canPrompt}
-      <button type="button" onclick={() => void promptInstall()}>{S.landingInstallAction}</button>
-    {:else if installState.showIosHelp}
-      <p>{S.installIosBody}</p>
-    {:else}
-      <p class="muted">{S.landingInstallNone}</p>
-    {/if}
-  </section>
+  {#if !installState.isInstalled}
+    <section class="install" aria-labelledby="install-title">
+      <h2 id="install-title">{S.landingInstallTitle}</h2>
+      {#if installState.canPrompt}
+        <button type="button" onclick={() => void promptInstall()}>{S.landingInstallAction}</button>
+      {:else if installState.showIosHelp}
+        <p>{S.installIosBody}</p>
+      {:else}
+        <p class="muted">{S.landingInstallNone}</p>
+      {/if}
+    </section>
+  {/if}
 </main>
 
 <style>

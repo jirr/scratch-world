@@ -27,7 +27,7 @@ Cocher chaque ligne et noter le résultat (appareil, version affichée dans Rég
 - [ ] Marche de 10 min : la pastille « Enregistrement · hh:mm:ss · +N cellules » progresse, le brouillard se dégage au fil du trajet.
 - [ ] L'écran reste allumé si l'option est activée.
 - [ ] « Arrêter » → la pastille disparaît ; les zones restent dévoilées après rechargement.
-- [ ] Passer l'app en arrière-plan puis revenir : l'enregistrement a bien été interrompu/repris sans crash (limite connue : pas de suivi en arrière-plan).
+- [ ] Passer l'app en arrière-plan puis revenir : l'enregistrement a bien été interrompu/repris sans crash (limite connue de la PWA : pas de suivi en arrière-plan ; applications natives : section 11).
 
 ## 4. Import (chaque format, avec **vos propres** fichiers — ne jamais les commiter)
 
@@ -81,3 +81,15 @@ Cocher chaque ligne et noter le résultat (appareil, version affichée dans Rég
 | Appareil | FPS médian (pan) | FPS médian (zoom) | Observations |
 | -------- | ---------------- | ----------------- | ------------ |
 |          |                  |                   |              |
+
+## 11. Applications natives (Android, iOS)
+
+Build et installation : README, « Applications natives ».
+
+- [ ] Android : après la page d'accueil, la position est demandée (choisir « Précise »), puis les notifications (Android 13+).
+- [ ] Android : pendant l'enregistrement, la notification « Scratch World gratte la carte » est affichée ; « Pause » la retire.
+- [ ] iPhone : sur un iPhone en français, les demandes d'autorisation sont en français ; l'indicateur de position bleu s'affiche quand l'app enregistre en arrière-plan.
+- [ ] **Écran verrouillé** : enregistrement en cours, verrouiller le téléphone, se déplacer 10 min, déverrouiller : tout le trajet est dévoilé (pas une ligne droite entre départ et arrivée).
+- [ ] **Arrière-plan** : même trajet en passant à une autre application : même résultat.
+- [ ] Refuser la position : la fenêtre « Position refusée » propose « Ouvrir les réglages », qui ouvre les réglages de l'application.
+- [ ] Ni fenêtre d'installation, ni bouton « Rechercher une mise à jour ».

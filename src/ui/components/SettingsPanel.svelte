@@ -2,7 +2,11 @@
   import { VERSION_LABEL } from '../../app/build-info';
   import { installState, promptInstall } from '../../app/install-service.svelte';
   import { profile, setPseudo } from '../../app/profile.svelte';
-  import { checkForUpdate, type UpdateCheckResult } from '../../app/update-service.svelte';
+  import {
+    checkForUpdate,
+    updatesEnabled,
+    type UpdateCheckResult,
+  } from '../../app/update-service.svelte';
   import type { BackupSession } from '../../app/backup-session.svelte';
   import type { ImportSession } from '../../app/import-session.svelte';
   import { storageState } from '../../platform/storage-persist.svelte';
@@ -194,10 +198,14 @@
         <button type="button" onclick={() => void promptInstall()}>{S.installMenu}</button>
       </p>
     {/if}
-    <button type="button" onclick={onCheck} disabled={checking}>
-      {checking ? S.updateChecking : S.updateCheck}
-    </button>
-    {#if updateResult}<p data-testid="update-check-result">{S.updateResults[updateResult]}</p>{/if}
+    {#if updatesEnabled}
+      <button type="button" onclick={onCheck} disabled={checking}>
+        {checking ? S.updateChecking : S.updateCheck}
+      </button>
+      {#if updateResult}<p data-testid="update-check-result">
+          {S.updateResults[updateResult]}
+        </p>{/if}
+    {/if}
   </Section>
 
   <p class="row end">

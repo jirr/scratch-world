@@ -7,7 +7,7 @@
   import { discoveryRadiusM } from '../../domain/discovery';
   import { startZoneCells } from '../../domain/start-zone';
   import { MapView, WebGL2RequiredError } from '../../map/map-view';
-  import { createPositionSource, PositionError } from '../../platform/position';
+  import { PositionError, type PositionSource } from '../../platform/position';
   import type { Recorder } from '../../recording/recorder.svelte';
   import { isDark, settings } from '../state/settings.svelte';
   import { ui } from '../state/ui.svelte';
@@ -16,11 +16,13 @@
 
   let {
     recorder,
+    positionSource,
     onPermissionDenied,
     onApproximate,
     retryToken,
   }: {
     recorder: Recorder;
+    positionSource: PositionSource;
     onPermissionDenied: () => void;
     onApproximate: () => void;
     retryToken: number;
@@ -42,8 +44,6 @@
   );
   let view = $state.raw<MapView | null>(null);
   let drawing = $state(false);
-
-  const positionSource = createPositionSource();
 
   const currentAppearance = () => ({
     style: settings.mapStyle,

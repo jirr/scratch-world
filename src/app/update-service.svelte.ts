@@ -1,7 +1,14 @@
 import { registerSW } from 'virtual:pwa-register';
+import { isNativeApp } from '../platform/native';
 import { busy } from './busy.svelte';
 
 const CHECK_INTERVAL_MS = 3_600_000;
+
+/**
+ * Dans l'application native, le code web est livré avec l'application et mis à jour par le
+ * store : pas de service worker (il resservirait l'ancienne version) ni de vérification.
+ */
+export const updatesEnabled = !isNativeApp;
 
 export type UpdateCheckResult = 'found' | 'up-to-date' | 'unavailable';
 
@@ -47,6 +54,7 @@ export function dismissUpdate(): void {
 }
 
 export function initUpdateService(): void {
+  if (!updatesEnabled) return;
   updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {

@@ -30,6 +30,8 @@ export default defineConfig(
     'perf/',
     'public/',
     'tests/fixtures/',
+    'android/',
+    'ios/',
   ]),
   js.configs.recommended,
   ts.configs.recommended,
